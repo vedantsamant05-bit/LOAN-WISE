@@ -13,6 +13,46 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const [simActive, setSimActive] = useState(false);
 
+  // Filter Dropdowns State
+  const [timeRange, setTimeRange] = useState('30d');
+  const [loanProduct, setLoanProduct] = useState('ALL');
+  const [riskTier, setRiskTier] = useState('ALL');
+  const [openDropdown, setOpenDropdown] = useState<'time' | 'product' | 'risk' | null>(null);
+
+  const timeOptions = [
+    { id: 'today', label: 'Today (24h)' },
+    { id: '7d', label: 'Last 7 days' },
+    { id: '30d', label: 'Last 30 days' },
+    { id: '90d', label: 'Last 90 days' },
+    { id: 'ALL', label: 'All time' },
+  ];
+
+  const productOptions = [
+    { id: 'ALL', label: 'All loan products' },
+    { id: 'PERSONAL', label: 'Unsecured Personal Loan' },
+    { id: 'SALARY', label: 'Salaried Advance Loan' },
+    { id: 'BUSINESS', label: 'Small Business Credit' },
+  ];
+
+  const riskTierOptions = [
+    { id: 'ALL', label: 'All risk tiers' },
+    { id: 'TIER1', label: 'Tier 1 — Prime (Score ≥ 75)' },
+    { id: 'TIER2', label: 'Tier 2 — Near-Prime (55–74)' },
+    { id: 'TIER3', label: 'Tier 3 — Subprime (< 55)' },
+  ];
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-filter-dropdown]')) {
+        setOpenDropdown(null);
+      }
+    };
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
+
   const fetchApplications = async () => {
     try {
       const res = await fetch('/api/applications');
@@ -28,6 +68,40 @@ export default function OverviewPage() {
   useEffect(() => {
     fetchApplications();
   }, []);
+
+  // Filter applications according to the active dropdown selections
+  const filteredApplications = applications.filter((app) => {
+    // Risk tier filtering
+    if (riskTier === 'TIER1') {
+      const score = app.decision?.scorecard?.score;
+      if (score === undefined || score < 0.75) return false;
+    } else if (riskTier === 'TIER2') {
+      const score = app.decision?.scorecard?.score;
+      if (score === undefined || score < 0.55 || score >= 0.75) return false;
+    } else if (riskTier === 'TIER3') {
+      const score = app.decision?.scorecard?.score;
+      if (score === undefined || score >= 0.55) return false;
+    }
+
+    // Loan product filtering
+    if (loanProduct === 'PERSONAL' && app.applicant.employmentType === 'Business') return false;
+    if (loanProduct === 'SALARY' && app.applicant.employmentType !== 'Salaried') return false;
+    if (loanProduct === 'BUSINESS' && app.applicant.employmentType !== 'Business' && app.applicant.employmentType !== 'Self-Employed') return false;
+
+    // Time range filtering
+    if (timeRange === 'today') {
+      const diffHours = (Date.now() - new Date(app.createdAt).getTime()) / (1000 * 3600);
+      if (diffHours > 24) return false;
+    } else if (timeRange === '7d') {
+      const diffDays = (Date.now() - new Date(app.createdAt).getTime()) / (1000 * 3600 * 24);
+      if (diffDays > 7) return false;
+    } else if (timeRange === '30d') {
+      const diffDays = (Date.now() - new Date(app.createdAt).getTime()) / (1000 * 3600 * 24);
+      if (diffDays > 30) return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="flex flex-col w-full">
@@ -84,35 +158,186 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        {/* Filter Strip */}
+        {/* Filter Strip with Clickable Interactive Dropdowns */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2.5 sm:p-space-sm rounded-xl bg-white shadow-sm border border-border">
           <div className="flex flex-wrap items-center gap-2 sm:gap-space-sm">
-            <button
-              className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 text-caption sm:text-body-compact font-medium transition-colors"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">calendar_today</span>
-              <span>Last 30 days</span>
-              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">expand_more</span>
-            </button>
+            {/* 1. Time Range Dropdown */}
+            <div className="relative" data-filter-dropdown>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenDropdown(openDropdown === 'time' ? null : 'time');
+                }}
+                className={`flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg text-caption sm:text-body-compact font-medium transition-all ${
+                  openDropdown === 'time' || timeRange !== '30d'
+                    ? 'bg-sage-100 text-forest-900 border border-sage-500/40 font-semibold shadow-xs'
+                    : 'bg-ivory-50 hover:bg-ivory-100 text-ink-900'
+                }`}
+                aria-expanded={openDropdown === 'time'}
+                aria-haspopup="true"
+              >
+                <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">calendar_today</span>
+                <span>{timeOptions.find((o) => o.id === timeRange)?.label || 'Last 30 days'}</span>
+                <span className={`material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500 transition-transform duration-200 ${openDropdown === 'time' ? 'rotate-180' : ''}`}>
+                  expand_more
+                </span>
+              </button>
+
+              {openDropdown === 'time' && (
+                <div className="absolute left-0 top-full mt-1.5 w-48 bg-white dark:bg-[#101b13] border border-border dark:border-[#203624] rounded-xl shadow-xl py-1.5 z-30 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink-500 border-b border-border dark:border-[#203624] mb-1">
+                    Select Time Window
+                  </div>
+                  {timeOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setTimeRange(opt.id);
+                        setOpenDropdown(null);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-xs sm:text-body-compact transition-colors ${
+                        timeRange === opt.id
+                          ? 'bg-sage-100 text-forest-900 font-semibold dark:bg-[#1a3824] dark:text-emerald-300'
+                          : 'text-ink-900 hover:bg-ivory-50 dark:hover:bg-[#16271c]'
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {timeRange === opt.id && (
+                        <span className="material-symbols-outlined text-[15px] text-forest-900 dark:text-emerald-400">check</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="hidden sm:block h-4 w-px bg-surface-container"></div>
-            <button
-              className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 text-caption sm:text-body-compact font-medium transition-colors"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">account_tree</span>
-              <span>All loan products</span>
-              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">expand_more</span>
-            </button>
+
+            {/* 2. Loan Product Dropdown */}
+            <div className="relative" data-filter-dropdown>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenDropdown(openDropdown === 'product' ? null : 'product');
+                }}
+                className={`flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg text-caption sm:text-body-compact font-medium transition-all ${
+                  openDropdown === 'product' || loanProduct !== 'ALL'
+                    ? 'bg-sage-100 text-forest-900 border border-sage-500/40 font-semibold shadow-xs'
+                    : 'bg-ivory-50 hover:bg-ivory-100 text-ink-900'
+                }`}
+                aria-expanded={openDropdown === 'product'}
+                aria-haspopup="true"
+              >
+                <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">account_tree</span>
+                <span>{productOptions.find((o) => o.id === loanProduct)?.label || 'All loan products'}</span>
+                <span className={`material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500 transition-transform duration-200 ${openDropdown === 'product' ? 'rotate-180' : ''}`}>
+                  expand_more
+                </span>
+              </button>
+
+              {openDropdown === 'product' && (
+                <div className="absolute left-0 top-full mt-1.5 w-56 bg-white dark:bg-[#101b13] border border-border dark:border-[#203624] rounded-xl shadow-xl py-1.5 z-30 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink-500 border-b border-border dark:border-[#203624] mb-1">
+                    Select Loan Product
+                  </div>
+                  {productOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setLoanProduct(opt.id);
+                        setOpenDropdown(null);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-xs sm:text-body-compact transition-colors ${
+                        loanProduct === opt.id
+                          ? 'bg-sage-100 text-forest-900 font-semibold dark:bg-[#1a3824] dark:text-emerald-300'
+                          : 'text-ink-900 hover:bg-ivory-50 dark:hover:bg-[#16271c]'
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {loanProduct === opt.id && (
+                        <span className="material-symbols-outlined text-[15px] text-forest-900 dark:text-emerald-400">check</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="hidden sm:block h-4 w-px bg-surface-container"></div>
-            <button
-              className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 text-caption sm:text-body-compact font-medium transition-colors"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">shield</span>
-              <span>All risk tiers</span>
-              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">expand_more</span>
-            </button>
+
+            {/* 3. Risk Tier Dropdown */}
+            <div className="relative" data-filter-dropdown>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenDropdown(openDropdown === 'risk' ? null : 'risk');
+                }}
+                className={`flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg text-caption sm:text-body-compact font-medium transition-all ${
+                  openDropdown === 'risk' || riskTier !== 'ALL'
+                    ? 'bg-sage-100 text-forest-900 border border-sage-500/40 font-semibold shadow-xs'
+                    : 'bg-ivory-50 hover:bg-ivory-100 text-ink-900'
+                }`}
+                aria-expanded={openDropdown === 'risk'}
+                aria-haspopup="true"
+              >
+                <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">shield</span>
+                <span>{riskTierOptions.find((o) => o.id === riskTier)?.label || 'All risk tiers'}</span>
+                <span className={`material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500 transition-transform duration-200 ${openDropdown === 'risk' ? 'rotate-180' : ''}`}>
+                  expand_more
+                </span>
+              </button>
+
+              {openDropdown === 'risk' && (
+                <div className="absolute left-0 sm:left-auto sm:right-0 md:left-0 top-full mt-1.5 w-64 bg-white dark:bg-[#101b13] border border-border dark:border-[#203624] rounded-xl shadow-xl py-1.5 z-30 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink-500 border-b border-border dark:border-[#203624] mb-1">
+                    Select Risk Cohort
+                  </div>
+                  {riskTierOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setRiskTier(opt.id);
+                        setOpenDropdown(null);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-xs sm:text-body-compact transition-colors ${
+                        riskTier === opt.id
+                          ? 'bg-sage-100 text-forest-900 font-semibold dark:bg-[#1a3824] dark:text-emerald-300'
+                          : 'text-ink-900 hover:bg-ivory-50 dark:hover:bg-[#16271c]'
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {riskTier === opt.id && (
+                        <span className="material-symbols-outlined text-[15px] text-forest-900 dark:text-emerald-400">check</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Reset button if any filter is active */}
+            {(timeRange !== '30d' || loanProduct !== 'ALL' || riskTier !== 'ALL') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setTimeRange('30d');
+                  setLoanProduct('ALL');
+                  setRiskTier('ALL');
+                  setOpenDropdown(null);
+                }}
+                className="flex items-center gap-1 h-8 sm:h-9 px-2.5 rounded-lg text-xs font-semibold text-status-danger bg-status-danger-bg hover:bg-status-danger/20 transition-colors"
+                title="Reset all filters"
+              >
+                <span className="material-symbols-outlined text-[15px]">restart_alt</span>
+                <span>Reset</span>
+              </button>
+            )}
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-2 text-caption font-caption text-ink-500 pt-1 sm:pt-0 border-t sm:border-t-0 border-border">
@@ -466,55 +691,84 @@ export default function OverviewPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-body-compact">
-                {applications.slice(0, 6).map((app) => (
-                  <tr key={app.id} className="hover:bg-ivory-50/80 dark:hover:bg-[#18271c] transition-colors">
-                    <td className="px-4 py-3.5 font-mono font-medium text-forest-900 dark:text-emerald-400">
-                      <Link href={`/applications/${app.id}`} className="hover:underline">
-                        {app.id}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <GeneralLogo type="applicant" name={app.applicant.name} size="sm" />
-                        <div className="flex flex-col">
-                          <span className="font-medium text-ink-900">{app.applicant.name}</span>
-                          <span className="text-caption text-ink-500">{app.applicant.city}</span>
-                        </div>
+                {filteredApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-ink-500">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-[32px] text-ink-400">filter_alt_off</span>
+                        <p className="font-medium text-ink-900">No applications match the selected filter cohort</p>
+                        <p className="text-caption text-ink-500">Try adjusting the time window, loan product, or risk tier filters.</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTimeRange('30d');
+                            setLoanProduct('ALL');
+                            setRiskTier('ALL');
+                          }}
+                          className="mt-1 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-forest-900 dark:text-emerald-400 bg-sage-100 hover:bg-sage-200 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">restart_alt</span>
+                          Reset all filters
+                        </button>
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-right font-medium text-ink-900 tabular-nums">
-                      ${app.requestedAmount.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3.5 text-center">
-                      {app.decision?.scorecard?.score ? (
-                        <span className="font-mono text-body-compact font-semibold text-ink-900">
-                          {(app.decision.scorecard.score * 100).toFixed(0)}
-                          <span className="text-caption text-ink-500">/100</span>
-                        </span>
-                      ) : (
-                        <span className="text-ink-500 text-caption">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <StatusBadge status={app.status} />
-                    </td>
-                    <td className="px-4 py-3.5 text-right">
-                      <Link
-                        href={`/applications/${app.id}`}
-                        className="inline-flex items-center gap-1 text-forest-900 dark:text-emerald-400 hover:text-forest-800 font-medium text-body-compact hover:underline"
-                      >
-                        <span>Explain</span>
-                        <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                      </Link>
-                    </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredApplications.slice(0, 6).map((app) => (
+                    <tr key={app.id} className="hover:bg-ivory-50/80 dark:hover:bg-[#18271c] transition-colors">
+                      <td className="px-4 py-3.5 font-mono font-medium text-forest-900 dark:text-emerald-400">
+                        <Link href={`/applications/${app.id}`} className="hover:underline">
+                          {app.id}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="flex items-center gap-2.5">
+                          <GeneralLogo type="applicant" name={app.applicant.name} size="sm" />
+                          <div className="flex flex-col">
+                            <span className="font-medium text-ink-900">{app.applicant.name}</span>
+                            <span className="text-caption text-ink-500">{app.applicant.city}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5 text-right font-medium text-ink-900 tabular-nums">
+                        ${app.requestedAmount.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3.5 text-center">
+                        {app.decision?.scorecard?.score ? (
+                          <span className="font-mono text-body-compact font-semibold text-ink-900">
+                            {(app.decision.scorecard.score * 100).toFixed(0)}
+                            <span className="text-caption text-ink-500">/100</span>
+                          </span>
+                        ) : (
+                          <span className="text-ink-500 text-caption">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <StatusBadge status={app.status} />
+                      </td>
+                      <td className="px-4 py-3.5 text-right">
+                        <Link
+                          href={`/applications/${app.id}`}
+                          className="inline-flex items-center gap-1 text-forest-900 dark:text-emerald-400 hover:text-forest-800 font-medium text-body-compact hover:underline"
+                        >
+                          <span>Explain</span>
+                          <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
           <div data-table-footer className="p-3 bg-[#F4F7F4] dark:bg-[#0C1610] border-t border-[#E2E7E2] dark:border-[#1C2E22] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-caption text-[#3D4C42] dark:text-[#D2E4D8] px-4">
-            <span>Showing {Math.min(6, applications.length)} of {applications.length} active applications</span>
+            <span>
+              Showing {Math.min(6, filteredApplications.length)} of {filteredApplications.length} applications
+              {filteredApplications.length !== applications.length && (
+                <span className="text-ink-500 ml-1">({applications.length} total)</span>
+              )}
+            </span>
             <span className="font-mono text-forest-900 dark:text-emerald-400 font-semibold">Policy: v4.2-active</span>
           </div>
         </div>
