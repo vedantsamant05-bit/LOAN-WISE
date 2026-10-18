@@ -14,7 +14,7 @@ const clonePolicy = (): PolicyConfig => JSON.parse(JSON.stringify(DEFAULT_POLICY
 const PRIME_APPLICANT: ApplicantData = {
   name: 'Marcus Chen',
   age: 38,
-  city: 'Seattle, WA',
+  city: 'Bengaluru, KA',
   employmentType: 'Salaried',
   monthlyIncome: 8500,
   requestedAmount: 25000,
@@ -27,7 +27,7 @@ const PRIME_APPLICANT: ApplicantData = {
 const HIGH_FOIR_APPLICANT: ApplicantData = {
   name: 'David Patel',
   age: 29,
-  city: 'Austin, TX',
+  city: 'Pune, MH',
   employmentType: 'Self-Employed',
   monthlyIncome: 6200,
   requestedAmount: 18000,
@@ -241,7 +241,7 @@ describe('Soft Rule R05 — Borderline FOIR Band (50%-65%)', () => {
     const sarahApplicant: ApplicantData = {
       name: 'Sarah Jenkins',
       age: 32,
-      city: 'Denver, CO',
+      city: 'Mumbai, MH',
       employmentType: 'Salaried',
       monthlyIncome: 5200,
       requestedAmount: 12500,

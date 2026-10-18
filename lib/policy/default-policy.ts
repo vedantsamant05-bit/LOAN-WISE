@@ -3,8 +3,8 @@ import { PolicyConfig } from '../types';
 export const DEFAULT_POLICY: PolicyConfig = {
   policyVersion: "v4.2-active",
   effectiveFrom: "2026-10-01",
-  createdBy: "Elena Vance (Risk Operations)",
-  description: "Retail Unsecured Personal Lending Standard Credit Policy",
+  createdBy: "Pooja Deshmukh (Risk Operations)",
+  description: "Retail Unsecured Personal Lending Standard Credit Policy (Indian Market Prototype)",
   rules: [
     // Hard Stops
     {

@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { Application, AuditEvent, PolicyConfig } from '../types';
 import { DEFAULT_POLICY } from '../policy/default-policy';
 import { defaultSimulationSettings, IntegrationSimulationSettings } from '../integrations';
@@ -7,20 +9,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8941',
     applicant: {
-      name: 'Sarah Jenkins',
+      name: 'Anjali Sharma',
       age: 32,
-      city: 'Denver, CO',
+      city: 'Mumbai, MH',
       employmentType: 'Salaried',
-      monthlyIncome: 5200,
-      declaredIncome: 5200,
-      requestedAmount: 12500,
+      monthlyIncome: 52000,
+      declaredIncome: 52000,
+      requestedAmount: 500000,
       tenureMonths: 36,
-      existingMonthlyObligations: 2693,
+      existingMonthlyObligations: 26936,
       panNumber: 'ABCDE1234F',
       avatarUrl:
         'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 12500,
+    requestedAmount: 500000,
     tenureMonths: 36,
     status: 'REFER',
     createdAt: '2026-10-17T14:32:18Z',
@@ -33,7 +35,7 @@ const INITIAL_APPLICATIONS: Application[] = [
       applicantMessage:
         'We are reviewing a few additional details regarding your application. A credit specialist will review your file shortly.',
       policyVersion: 'v4.2-active',
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs: 1280,
       createdAt: '2026-10-17T14:32:19Z',
       foir: 51.8,
@@ -41,8 +43,8 @@ const INITIAL_APPLICATIONS: Application[] = [
       scorecard: {
         score: 0.684,
         defaultProbability: 0.048,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Logistic Regression Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [
           {
             feature: 'foir_ratio',
@@ -70,7 +72,7 @@ const INITIAL_APPLICATIONS: Application[] = [
             label: 'Stable Verified Salary',
             impact: 'positive',
             weight: 0.28,
-            description: 'Net income of $5,200/mo verified via direct deposit.',
+            description: 'Net income of ₹52,000/mo verified via salary credit.',
           },
         ],
       },
@@ -151,8 +153,8 @@ const INITIAL_APPLICATIONS: Application[] = [
           description: 'Requested facility <= 10x monthly income.',
           type: 'soft',
           passed: true,
-          observedValue: '$12,500',
-          threshold: '<= $52,000 (10x income)',
+          observedValue: '₹5,00,000',
+          threshold: '<= ₹5,20,000 (10x income)',
           reasonCode: 'AMOUNT_ABOVE_CAP',
         },
       ],
@@ -176,7 +178,7 @@ const INITIAL_APPLICATIONS: Application[] = [
           status: 'SUCCESS',
           latencyMs: 142,
           attempt: 1,
-          data: { verifiedMonthlyIncome: 5200, isConsistent: true },
+          data: { verifiedMonthlyIncome: 52000, isConsistent: true },
         },
       ],
       internalDetail: {
@@ -202,20 +204,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8940',
     applicant: {
-      name: 'Marcus Chen',
+      name: 'Rohan Mehta',
       age: 38,
-      city: 'Seattle, WA',
+      city: 'Bengaluru, KA',
       employmentType: 'Salaried',
-      monthlyIncome: 8500,
-      declaredIncome: 8500,
-      requestedAmount: 25000,
+      monthlyIncome: 85000,
+      declaredIncome: 85000,
+      requestedAmount: 2500000,
       tenureMonths: 48,
-      existingMonthlyObligations: 1800,
+      existingMonthlyObligations: 18000,
       panNumber: 'MKC892110L',
       avatarUrl:
         'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 25000,
+    requestedAmount: 2500000,
     tenureMonths: 48,
     status: 'APPROVE',
     createdAt: '2026-10-17T13:10:04Z',
@@ -227,7 +229,7 @@ const INITIAL_APPLICATIONS: Application[] = [
       reasonCodes: ['POLICY_AND_SCORE_PASS'],
       applicantMessage: 'Congratulations! Your loan application has been approved.',
       policyVersion: 'v4.2-active',
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs: 890,
       createdAt: '2026-10-17T13:10:05Z',
       foir: 28.2,
@@ -235,8 +237,8 @@ const INITIAL_APPLICATIONS: Application[] = [
       scorecard: {
         score: 0.892,
         defaultProbability: 0.016,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [
           {
             feature: 'bureau_score',
@@ -267,20 +269,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8939',
     applicant: {
-      name: 'David Patel',
+      name: 'Deepak Verma',
       age: 29,
-      city: 'Austin, TX',
+      city: 'Pune, MH',
       employmentType: 'Self-Employed',
-      monthlyIncome: 6200,
-      declaredIncome: 6200,
-      requestedAmount: 18000,
+      monthlyIncome: 62000,
+      declaredIncome: 62000,
+      requestedAmount: 1800000,
       tenureMonths: 36,
-      existingMonthlyObligations: 4400,
+      existingMonthlyObligations: 44000,
       panNumber: 'DPX482910M',
       avatarUrl:
         'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 18000,
+    requestedAmount: 1800000,
     tenureMonths: 36,
     status: 'REJECT',
     createdAt: '2026-10-17T11:45:22Z',
@@ -329,20 +331,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8938',
     applicant: {
-      name: 'Jessica Taylor',
+      name: 'Sneha Iyer',
       age: 26,
-      city: 'Chicago, IL',
+      city: 'Chennai, TN',
       employmentType: 'Salaried',
-      monthlyIncome: 4800,
-      declaredIncome: 4800,
-      requestedAmount: 8000,
+      monthlyIncome: 48000,
+      declaredIncome: 48000,
+      requestedAmount: 800000,
       tenureMonths: 24,
-      existingMonthlyObligations: 1200,
+      existingMonthlyObligations: 12000,
       panNumber: 'JTX991203A',
       avatarUrl:
         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 8000,
+    requestedAmount: 800000,
     tenureMonths: 24,
     status: 'PENDING',
     createdAt: '2026-10-17T10:15:30Z',
@@ -355,7 +357,7 @@ const INITIAL_APPLICATIONS: Application[] = [
       applicantMessage:
         'Verification service connection timed out. System is automatically retrying verification in the background.',
       policyVersion: 'v4.2-active',
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs: 3120,
       createdAt: '2026-10-17T10:15:33Z',
       foir: 33.1,
@@ -363,8 +365,8 @@ const INITIAL_APPLICATIONS: Application[] = [
       scorecard: {
         score: 0,
         defaultProbability: 0,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [],
       },
       ruleResults: [],
@@ -397,20 +399,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8937',
     applicant: {
-      name: 'Vikram Malhotra',
+      name: 'Vikram Nair',
       age: 31,
-      city: 'Phoenix, AZ',
+      city: 'Hyderabad, TS',
       employmentType: 'Salaried',
-      monthlyIncome: 3800,
-      declaredIncome: 3800,
-      requestedAmount: 15000,
+      monthlyIncome: 38000,
+      declaredIncome: 38000,
+      requestedAmount: 1500000,
       tenureMonths: 36,
-      existingMonthlyObligations: 2750,
+      existingMonthlyObligations: 27500,
       panNumber: 'VMK441920R',
       avatarUrl:
         'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 15000,
+    requestedAmount: 1500000,
     tenureMonths: 36,
     status: 'REJECT',
     createdAt: '2026-10-17T09:40:12Z',
@@ -423,7 +425,7 @@ const INITIAL_APPLICATIONS: Application[] = [
       applicantMessage:
         'Application declined due to low bureau score and obligations exceeding debt capacity ceiling.',
       policyVersion: 'v4.2-active',
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs: 640,
       createdAt: '2026-10-17T09:40:13Z',
       foir: 72.3,
@@ -431,8 +433,8 @@ const INITIAL_APPLICATIONS: Application[] = [
       scorecard: {
         score: 0.385,
         defaultProbability: 0.224,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [
           {
             feature: 'bureau_score',
@@ -474,20 +476,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8936',
     applicant: {
-      name: 'Aisha Al-Mansoor',
+      name: 'Meera Krishnan',
       age: 42,
-      city: 'Dallas, TX',
+      city: 'Kolkata, WB',
       employmentType: 'Business',
-      monthlyIncome: 14500,
-      declaredIncome: 14500,
-      requestedAmount: 45000,
+      monthlyIncome: 145000,
+      declaredIncome: 145000,
+      requestedAmount: 4500000,
       tenureMonths: 48,
-      existingMonthlyObligations: 3200,
+      existingMonthlyObligations: 32000,
       panNumber: 'AAM882190P',
       avatarUrl:
         'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 45000,
+    requestedAmount: 4500000,
     tenureMonths: 48,
     status: 'APPROVE',
     createdAt: '2026-10-17T08:22:45Z',
@@ -499,7 +501,7 @@ const INITIAL_APPLICATIONS: Application[] = [
       reasonCodes: ['POLICY_AND_SCORE_PASS'],
       applicantMessage: 'Congratulations! Your small business facility is approved.',
       policyVersion: 'v4.2-active',
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs: 810,
       createdAt: '2026-10-17T08:22:46Z',
       foir: 22.0,
@@ -507,8 +509,8 @@ const INITIAL_APPLICATIONS: Application[] = [
       scorecard: {
         score: 0.884,
         defaultProbability: 0.018,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [
           {
             feature: 'bureau_score',
@@ -532,20 +534,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8935',
     applicant: {
-      name: 'Carlos Mendez',
+      name: 'Karan Bhatia',
       age: 28,
-      city: 'Miami, FL',
+      city: 'Ahmedabad, GJ',
       employmentType: 'Salaried',
-      monthlyIncome: 5800,
-      declaredIncome: 5800,
-      requestedAmount: 14000,
+      monthlyIncome: 58000,
+      declaredIncome: 58000,
+      requestedAmount: 1400000,
       tenureMonths: 24,
-      existingMonthlyObligations: 1800,
+      existingMonthlyObligations: 18000,
       panNumber: 'CMD339102X',
       avatarUrl:
         'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 14000,
+    requestedAmount: 1400000,
     tenureMonths: 24,
     status: 'APPROVE',
     createdAt: '2026-10-17T07:15:00Z',
@@ -557,7 +559,7 @@ const INITIAL_APPLICATIONS: Application[] = [
       reasonCodes: ['POLICY_AND_SCORE_PASS'],
       applicantMessage: 'Your salaried advance loan is approved.',
       policyVersion: 'v4.2-active',
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs: 760,
       createdAt: '2026-10-17T07:15:01Z',
       foir: 31.0,
@@ -565,8 +567,8 @@ const INITIAL_APPLICATIONS: Application[] = [
       scorecard: {
         score: 0.795,
         defaultProbability: 0.025,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [],
       },
       ruleResults: [],
@@ -582,20 +584,20 @@ const INITIAL_APPLICATIONS: Application[] = [
   {
     id: 'APP-8934',
     applicant: {
-      name: 'Priya Sharma',
+      name: 'Priya Joshi',
       age: 35,
-      city: 'San Jose, CA',
+      city: 'Jaipur, RJ',
       employmentType: 'Business',
-      monthlyIncome: 9200,
-      declaredIncome: 9200,
-      requestedAmount: 28000,
+      monthlyIncome: 92000,
+      declaredIncome: 92000,
+      requestedAmount: 2800000,
       tenureMonths: 36,
-      existingMonthlyObligations: 4900,
+      existingMonthlyObligations: 49000,
       panNumber: 'PSH991204K',
       avatarUrl:
         'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&auto=format&fit=crop&q=80',
     },
-    requestedAmount: 28000,
+    requestedAmount: 2800000,
     tenureMonths: 36,
     status: 'REFER',
     createdAt: '2026-10-17T06:45:00Z',
@@ -607,7 +609,7 @@ const INITIAL_APPLICATIONS: Application[] = [
       reasonCodes: ['FOIR_BORDERLINE'],
       applicantMessage: 'Application referred for debt capacity verification.',
       policyVersion: 'v4.2-active',
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs: 1390,
       createdAt: '2026-10-17T06:45:02Z',
       foir: 53.2,
@@ -615,8 +617,8 @@ const INITIAL_APPLICATIONS: Application[] = [
       scorecard: {
         score: 0.642,
         defaultProbability: 0.052,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [],
       },
       ruleResults: [],
@@ -636,11 +638,11 @@ const INITIAL_AUDIT_LOG: AuditEvent[] = [
     id: 'AUD-001',
     applicationId: 'APP-8941',
     eventType: 'APPLICATION_SUBMITTED',
-    actor: 'Sarah Jenkins (Direct Web API)',
+    actor: 'Anjali Sharma (Direct Web API)',
     policyVersion: 'v4.2-active',
-    modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+    modelVersion: 'HeuristicLogistic-Scorecard v1.0',
     timestamp: '2026-10-17T14:32:18Z',
-    details: 'Application submitted for $12,500 over 36 months.',
+    details: 'Application submitted for ₹5,00,000 over 36 months.',
   },
   {
     id: 'AUD-002',
@@ -648,7 +650,7 @@ const INITIAL_AUDIT_LOG: AuditEvent[] = [
     eventType: 'DECISION_RENDERED',
     actor: 'DecisionEngine Core Orchestrator',
     policyVersion: 'v4.2-active',
-    modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+    modelVersion: 'HeuristicLogistic-Scorecard v1.0',
     timestamp: '2026-10-17T14:32:19Z',
     details: 'Outcome: REFER. Triggered rule: FOIR_BORDERLINE (51.8%).',
   },
@@ -658,7 +660,7 @@ const INITIAL_AUDIT_LOG: AuditEvent[] = [
     eventType: 'DECISION_RENDERED',
     actor: 'DecisionEngine Core Orchestrator',
     policyVersion: 'v4.2-active',
-    modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+    modelVersion: 'HeuristicLogistic-Scorecard v1.0',
     timestamp: '2026-10-17T13:10:05Z',
     details: 'Outcome: APPROVE. Score: 0.892, Bureau: 785.',
   },
@@ -672,12 +674,105 @@ const INITIAL_AUDIT_LOG: AuditEvent[] = [
   },
 ];
 
-// Global in-memory singleton
-class LoanWiseStore {
+interface PersistedState {
+  version: number;
+  lastSavedAt: string;
+  applications: Application[];
+  currentPolicy: PolicyConfig;
+  auditEvents: AuditEvent[];
+  simulationSettings: IntegrationSimulationSettings;
+}
+
+// Global durable singleton with file-backed persistence and in-memory cache
+export class LoanWiseStore {
   private applications: Application[] = [...INITIAL_APPLICATIONS];
   private currentPolicy: PolicyConfig = { ...DEFAULT_POLICY };
   private auditEvents: AuditEvent[] = [...INITIAL_AUDIT_LOG];
   private simulationSettings: IntegrationSimulationSettings = { ...defaultSimulationSettings };
+  private persistenceFilePath: string | null = null;
+  private isPersistenceActive: boolean = false;
+
+  constructor() {
+    this.initPersistence();
+  }
+
+  private initPersistence(): void {
+    try {
+      const dataDir = path.resolve(process.cwd(), 'data');
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      this.persistenceFilePath = path.join(dataDir, 'loanwise_store.json');
+
+      if (fs.existsSync(this.persistenceFilePath)) {
+        const raw = fs.readFileSync(this.persistenceFilePath, 'utf-8');
+        const parsed = JSON.parse(raw) as Partial<PersistedState>;
+        if (Array.isArray(parsed.applications) && parsed.applications.length > 0) {
+          this.applications = parsed.applications;
+        }
+        if (Array.isArray(parsed.auditEvents) && parsed.auditEvents.length > 0) {
+          this.auditEvents = parsed.auditEvents;
+        }
+        if (parsed.currentPolicy && parsed.currentPolicy.rules) {
+          this.currentPolicy = parsed.currentPolicy;
+        }
+        if (parsed.simulationSettings) {
+          this.simulationSettings = parsed.simulationSettings;
+        }
+      } else {
+        this.saveToDisk();
+      }
+      this.isPersistenceActive = true;
+    } catch (err) {
+      // In read-only or serverless environments, safely fallback to in-memory store
+      this.isPersistenceActive = false;
+    }
+  }
+
+  private saveToDisk(): void {
+    if (!this.persistenceFilePath) return;
+    try {
+      const payload: PersistedState = {
+        version: 1,
+        lastSavedAt: new Date().toISOString(),
+        applications: this.applications,
+        currentPolicy: this.currentPolicy,
+        auditEvents: this.auditEvents,
+        simulationSettings: this.simulationSettings,
+      };
+      fs.writeFileSync(this.persistenceFilePath, JSON.stringify(payload, null, 2), 'utf-8');
+      this.isPersistenceActive = true;
+    } catch (err) {
+      this.isPersistenceActive = false;
+    }
+  }
+
+  public isDurable(): boolean {
+    return this.isPersistenceActive;
+  }
+
+  public reloadFromDisk(): boolean {
+    if (!this.persistenceFilePath || !fs.existsSync(this.persistenceFilePath)) return false;
+    try {
+      const raw = fs.readFileSync(this.persistenceFilePath, 'utf-8');
+      const parsed = JSON.parse(raw) as PersistedState;
+      if (Array.isArray(parsed.applications)) this.applications = parsed.applications;
+      if (Array.isArray(parsed.auditEvents)) this.auditEvents = parsed.auditEvents;
+      if (parsed.currentPolicy) this.currentPolicy = parsed.currentPolicy;
+      if (parsed.simulationSettings) this.simulationSettings = parsed.simulationSettings;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  public resetToSeed(): void {
+    this.applications = [...INITIAL_APPLICATIONS];
+    this.currentPolicy = { ...DEFAULT_POLICY };
+    this.auditEvents = [...INITIAL_AUDIT_LOG];
+    this.simulationSettings = { ...defaultSimulationSettings };
+    this.saveToDisk();
+  }
 
   getApplications(): Application[] {
     return this.applications;
@@ -689,6 +784,7 @@ class LoanWiseStore {
 
   addApplication(app: Application): void {
     this.applications.unshift(app);
+    this.saveToDisk();
   }
 
   updateApplication(id: string, updates: Partial<Application>): Application | undefined {
@@ -699,6 +795,7 @@ class LoanWiseStore {
         ...updates,
         updatedAt: new Date().toISOString(),
       };
+      this.saveToDisk();
       return this.applications[idx];
     }
     return undefined;
@@ -708,7 +805,7 @@ class LoanWiseStore {
     return this.currentPolicy;
   }
 
-  updatePolicy(newPolicy: PolicyConfig, actor: string = 'Elena Vance'): void {
+  updatePolicy(newPolicy: PolicyConfig, actor: string = 'Credit Policy Committee'): void {
     this.currentPolicy = newPolicy;
     this.addAuditEvent({
       id: `AUD-${Date.now()}`,
@@ -718,6 +815,7 @@ class LoanWiseStore {
       timestamp: new Date().toISOString(),
       details: `Credit policy updated to version ${newPolicy.policyVersion}.`,
     });
+    this.saveToDisk();
   }
 
   getAuditEvents(): AuditEvent[] {
@@ -726,6 +824,7 @@ class LoanWiseStore {
 
   addAuditEvent(event: AuditEvent): void {
     this.auditEvents.unshift(event);
+    this.saveToDisk();
   }
 
   getSimulationSettings(): IntegrationSimulationSettings {
@@ -734,6 +833,7 @@ class LoanWiseStore {
 
   setSimulationSettings(settings: Partial<IntegrationSimulationSettings>): void {
     this.simulationSettings = { ...this.simulationSettings, ...settings };
+    this.saveToDisk();
   }
 }
 
@@ -741,3 +841,4 @@ class LoanWiseStore {
 const globalForStore = globalThis as unknown as { loanWiseStore: LoanWiseStore };
 export const loanWiseStore = globalForStore.loanWiseStore || new LoanWiseStore();
 if (process.env.NODE_ENV !== 'production') globalForStore.loanWiseStore = loanWiseStore;
+

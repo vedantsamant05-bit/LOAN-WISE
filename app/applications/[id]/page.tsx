@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { GeneralLogo } from '@/components/ui/GeneralLogo';
 import { ManualReviewModal } from '@/components/modals/ManualReviewModal';
 import { Application } from '@/lib/types';
+import { formatIndianDate } from '@/lib/utils/formatters';
 
 export default function DecisionResultPage() {
   const params = useParams();
@@ -189,7 +190,7 @@ export default function DecisionResultPage() {
             </div>
             <p className="text-ink-700 mt-0.5">{manualReview.notes}</p>
             <div className="text-caption text-sage-700 mt-1">
-              Resolved by {manualReview.resolvedBy} on {new Date(manualReview.resolvedAt).toLocaleString()}
+              Resolved by {manualReview.resolvedBy} on {formatIndianDate(manualReview.resolvedAt, { includeTime: true })}
             </div>
           </div>
         </div>
@@ -233,9 +234,9 @@ export default function DecisionResultPage() {
             </span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className="font-section-title text-section-title font-semibold text-ink-900">
-                ${applicant.requestedAmount.toLocaleString()}
+                ₹{applicant.requestedAmount.toLocaleString('en-IN')}
               </span>
-              <span className="font-caption text-caption text-ink-500 font-medium">USD</span>
+              <span className="font-caption text-caption text-ink-500 font-medium">INR</span>
             </div>
             <div className="flex items-center gap-2 mt-1 font-caption text-caption text-ink-700">
               <span className="inline-flex items-center gap-1">
@@ -272,10 +273,10 @@ export default function DecisionResultPage() {
             </div>
             <div className="flex items-center gap-2 mt-1 font-caption text-caption text-ink-700 flex-wrap">
               <span>
-                Net: <strong>${applicant.monthlyIncome.toLocaleString()}/mo</strong>
+                Net: <strong>₹{applicant.monthlyIncome.toLocaleString('en-IN')}/mo</strong>
               </span>
               <span className="text-ink-500">•</span>
-              <span>Oblig: ${applicant.existingMonthlyObligations.toLocaleString()}/mo</span>
+              <span>Oblig: ₹{applicant.existingMonthlyObligations.toLocaleString('en-IN')}/mo</span>
             </div>
           </div>
 
@@ -294,7 +295,7 @@ export default function DecisionResultPage() {
               </span>
             </div>
             <div className="flex items-center justify-between mt-1 text-caption font-caption text-ink-500">
-              <span>{decision?.createdAt ? new Date(decision.createdAt).toLocaleTimeString() : 'Pending'}</span>
+              <span>{decision?.createdAt ? formatIndianDate(decision.createdAt, { includeTime: true }) : 'Pending'}</span>
               <span className="text-status-success font-medium">{decision?.tatMs || 1280}ms latency</span>
             </div>
           </div>

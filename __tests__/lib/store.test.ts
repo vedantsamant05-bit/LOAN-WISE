@@ -56,7 +56,7 @@ describe('LoanWiseStore — Applications', () => {
   it('seed applications are present (APP-8941 should exist)', () => {
     const app = loanWiseStore.getApplicationById('APP-8941');
     expect(app).toBeDefined();
-    expect(app!.applicant.name).toBe('Sarah Jenkins');
+    expect(app!.applicant.name).toBe('Anjali Sharma');
   });
 
   it('getApplicationById is case-insensitive', () => {

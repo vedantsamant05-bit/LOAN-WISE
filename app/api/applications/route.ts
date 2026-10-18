@@ -55,13 +55,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const monthlyIncome = isNaN(rawIncome) ? 5000 : rawIncome;
-    const requestedAmount = isNaN(rawAmount) ? 10000 : rawAmount;
+    const monthlyIncome = isNaN(rawIncome) ? 50000 : rawIncome;
+    const requestedAmount = isNaN(rawAmount) ? 500000 : rawAmount;
 
     const applicant: ApplicantData = {
       name: body.name || 'Anonymous Applicant',
       age: Number(body.age) || 30,
-      city: body.city || 'Chicago, IL',
+      city: body.city || 'Mumbai, MH',
       employmentType: body.employmentType || 'Salaried',
       monthlyIncome,
       declaredIncome: Number(body.declaredIncome) || monthlyIncome,
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       policyVersion: policy.policyVersion,
       modelVersion: decision.modelVersion,
       timestamp: decision.createdAt,
-      details: `Application submitted for $${applicant.requestedAmount.toLocaleString()} over ${applicant.tenureMonths}m. Initial outcome: ${decision.outcome}.`,
+      details: `Application submitted for ₹${applicant.requestedAmount.toLocaleString('en-IN')} over ${applicant.tenureMonths}m. Initial outcome: ${decision.outcome}.`,
     });
 
     return NextResponse.json(newApp, { status: 201 });

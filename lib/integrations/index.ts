@@ -47,11 +47,14 @@ export async function callBureauService(
   if (behavior === 'ADVERSE') {
     baseScore = 580;
     writeOffs = true;
-  } else if (applicant.name.toLowerCase().includes('sarah')) {
-    // Exactly matches the Stitch screen for APP-8941 Sarah Jenkins
+  } else if (
+    applicant.name.toLowerCase().includes('sarah') ||
+    applicant.name.toLowerCase().includes('anjali')
+  ) {
+    // Exactly matches the target profile for APP-8941 (Anjali Sharma / legacy Sarah Jenkins)
     baseScore = 738;
     writeOffs = false;
-    activeTradelines = 2; // Thin file
+    activeTradelines = 2; // Thin file (<3 years active credit history)
   } else if (applicant.age < 23) {
     baseScore = 670;
   }

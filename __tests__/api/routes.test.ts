@@ -14,20 +14,38 @@
  */
 
 const BASE_URL = 'http://localhost:3000';
+const REVIEW_KEY = 'lw-review-secret-2026';
+const authHeaders = {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${REVIEW_KEY}`,
+};
 
 async function api(
   path: string,
   options?: RequestInit
 ): Promise<{ status: number; body: any }> {
+  const headers = { 'Content-Type': 'application/json', ...(options?.headers || {}) };
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
+    headers,
   });
   const body = await res.json().catch(() => null);
   return { status: res.status, body };
 }
 
 // ─── GET /api/applications ────────────────────────────────────────────────
+beforeAll(async () => {
+  for (let i = 0; i < 5; i++) {
+    try {
+      const res = await api('/api/applications');
+      if (res.status === 200) break;
+    } catch {
+      // wait for compilation
+    }
+    await new Promise((r) => setTimeout(r, 600));
+  }
+}, 10000);
+
 describe('GET /api/applications', () => {
   it('returns 200 with applications array', async () => {
     const { status, body } = await api('/api/applications');
@@ -70,17 +88,17 @@ describe('GET /api/applications', () => {
     expect(all.total).toBe(unfiltered.total);
   });
 
-  it('search by name (q=sarah) returns Sarah Jenkins', async () => {
-    const { body } = await api('/api/applications?q=sarah');
+  it('search by name (q=anjali) returns Anjali Sharma', async () => {
+    const { body } = await api('/api/applications?q=anjali');
     expect(body.total).toBeGreaterThan(0);
     const names = body.applications.map((a: any) => a.applicant.name.toLowerCase());
-    expect(names.some((n: string) => n.includes('sarah'))).toBe(true);
+    expect(names.some((n: string) => n.includes('anjali'))).toBe(true);
   });
 
-  it('search by city (q=denver) returns Denver apps', async () => {
-    const { body } = await api('/api/applications?q=denver');
+  it('search by city (q=mumbai) returns Mumbai apps', async () => {
+    const { body } = await api('/api/applications?q=mumbai');
     for (const app of body.applications) {
-      expect(app.applicant.city.toLowerCase()).toContain('denver');
+      expect(app.applicant.city.toLowerCase()).toContain('mumbai');
     }
   });
 
@@ -236,10 +254,10 @@ describe('GET /api/applications/:id', () => {
 
   it('returns applicant data correctly', async () => {
     const { body } = await api('/api/applications/APP-8941');
-    expect(body.applicant.name).toBe('Sarah Jenkins');
+    expect(body.applicant.name).toBe('Anjali Sharma');
     expect(body.applicant.age).toBe(32);
-    expect(body.applicant.city).toBe('Denver, CO');
-    expect(body.applicant.monthlyIncome).toBe(5200);
+    expect(body.applicant.city).toBe('Mumbai, MH');
+    expect(body.applicant.monthlyIncome).toBe(52000);
     // status may have been mutated by earlier review tests in the same run
     expect(['REFER', 'APPROVE', 'REJECT']).toContain(body.status);
   });
@@ -253,9 +271,33 @@ describe('GET /api/applications/:id', () => {
 
 // ─── POST /api/applications/:id/review ───────────────────────────────────
 describe('POST /api/applications/:id/review', () => {
-  it('approves an application with APPROVE_OVERRIDE', async () => {
+  it('returns 401 for unauthenticated manual review request', async () => {
     const { status, body } = await api('/api/applications/APP-8941/review', {
       method: 'POST',
+      body: JSON.stringify({
+        action: 'APPROVE_OVERRIDE',
+        notes: 'Unauthenticated attempt',
+      }),
+    });
+    expect(status).toBe(401);
+    expect(body.error).toContain('Unauthorized');
+  });
+
+  it('returns 401 for invalid Bearer token', async () => {
+    const { status } = await api('/api/applications/APP-8941/review', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer wrong-key-xyz' },
+      body: JSON.stringify({
+        action: 'APPROVE_OVERRIDE',
+      }),
+    });
+    expect(status).toBe(401);
+  });
+
+  it('approves an application with APPROVE_OVERRIDE when authorized', async () => {
+    const { status, body } = await api('/api/applications/APP-8941/review', {
+      method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({
         action: 'APPROVE_OVERRIDE',
         notes: 'Manual underwriter approval after review',
@@ -267,9 +309,10 @@ describe('POST /api/applications/:id/review', () => {
     expect(body.manualReview.resolution).toBe('APPROVE_OVERRIDE');
   });
 
-  it('rejects an application with REJECT_OVERRIDE', async () => {
+  it('rejects an application with REJECT_OVERRIDE when authorized', async () => {
     const { status, body } = await api('/api/applications/APP-8941/review', {
       method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({
         action: 'REJECT_OVERRIDE',
         notes: 'Manual rejection after policy committee review',
@@ -280,44 +323,49 @@ describe('POST /api/applications/:id/review', () => {
     expect(body.manualReview.resolution).toBe('REJECT_OVERRIDE');
   });
 
-  it('manualReview.notes is persisted', async () => {
+  it('manualReview.notes is persisted when authorized', async () => {
     await api('/api/applications/APP-8940/review', {
       method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({ action: 'APPROVE_OVERRIDE', notes: 'Test notes xyz' }),
     });
     const { body } = await api('/api/applications/APP-8940');
     expect(body.manualReview.notes).toBe('Test notes xyz');
   });
 
-  it('returns 400 for invalid action', async () => {
+  it('returns 400 for invalid action when authorized', async () => {
     const { status, body } = await api('/api/applications/APP-8941/review', {
       method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({ action: 'INVALID_ACTION' }),
     });
     expect(status).toBe(400);
     expect(body.error).toBeTruthy();
   });
 
-  it('returns 404 for non-existent application', async () => {
+  it('returns 404 for non-existent application when authorized', async () => {
     const { status } = await api('/api/applications/APP-NONEXISTENT/review', {
       method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({ action: 'APPROVE_OVERRIDE' }),
     });
     expect(status).toBe(404);
   });
 
-  it('manualReview has resolvedAt timestamp', async () => {
+  it('manualReview has resolvedAt timestamp when authorized', async () => {
     const { body } = await api('/api/applications/APP-8941/review', {
       method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({ action: 'APPROVE_OVERRIDE' }),
     });
     expect(body.manualReview.resolvedAt).toBeTruthy();
     expect(new Date(body.manualReview.resolvedAt).toString()).not.toBe('Invalid Date');
   });
 
-  it('audit event is created for manual review', async () => {
+  it('audit event is created for manual review when authorized', async () => {
     await api('/api/applications/APP-8941/review', {
       method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({ action: 'APPROVE_OVERRIDE', notes: 'Audit check' }),
     });
     const { body } = await api('/api/audit');
@@ -608,6 +656,7 @@ describe('End-to-End Workflow: Submit → REFER → Manual Review → APPROVE', 
     if (!e2eAppId) return;
     const { body } = await api(`/api/applications/${e2eAppId}/review`, {
       method: 'POST',
+      headers: authHeaders,
       body: JSON.stringify({ action: 'APPROVE_OVERRIDE', notes: 'E2E workflow test approval' }),
     });
     expect(body.status).toBe('APPROVE');

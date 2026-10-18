@@ -3,16 +3,17 @@ import { DEFAULT_POLICY } from '../lib/policy/default-policy';
 import { runScorecardInference } from '../lib/ml/scorecard';
 import { ApplicantData } from '../lib/types';
 import { performance } from 'perf_hooks';
+import { calculateAmortizedEMI, calculateFOIR } from '../lib/utils/formatters';
 
 describe('Quantitative Audit & Performance Benchmark', () => {
   const sampleApplicant: ApplicantData = {
     name: 'Benchmark Subject',
     age: 32,
-    city: 'Chicago, IL',
+    city: 'Bengaluru, KA',
     employmentType: 'Salaried',
-    monthlyIncome: 6500,
-    existingMonthlyObligations: 1200,
-    requestedAmount: 15000,
+    monthlyIncome: 65000,
+    existingMonthlyObligations: 12000,
+    requestedAmount: 500000,
     tenureMonths: 24,
     panNumber: 'ABCDE1234F',
   };
@@ -43,18 +44,18 @@ describe('Quantitative Audit & Performance Benchmark', () => {
 
   test('FOIR Accuracy against independent formula', async () => {
     const foirTestCases = [
-      { income: 10000, obligations: 2000, amount: 20000, tenure: 24 },
-      { income: 5000, obligations: 1500, amount: 10000, tenure: 12 },
-      { income: 8000, obligations: 0, amount: 30000, tenure: 36 },
-      { income: 3000, obligations: 1200, amount: 5000, tenure: 24 },
-      { income: 15000, obligations: 4500, amount: 50000, tenure: 48 },
+      { income: 100000, obligations: 20000, amount: 500000, tenure: 24 },
+      { income: 50000, obligations: 15000, amount: 200000, tenure: 12 },
+      { income: 80000, obligations: 0, amount: 800000, tenure: 36 },
+      { income: 30000, obligations: 12000, amount: 150000, tenure: 24 },
+      { income: 150000, obligations: 45000, amount: 1200000, tenure: 48 },
     ];
 
     for (let idx = 0; idx < foirTestCases.length; idx++) {
       const tc = foirTestCases[idx];
-      const estimatedNewEmi = (tc.amount / tc.tenure) * 1.15;
-      const expectedTotalDebt = tc.obligations + estimatedNewEmi;
-      const expectedFoir = expectedTotalDebt / tc.income;
+      const annualRate = DEFAULT_POLICY.defaultAnnualInterestRate || 0.12;
+      const expectedNewEmi = calculateAmortizedEMI(tc.amount, annualRate, tc.tenure);
+      const expectedFoirPercent = calculateFOIR(tc.obligations, expectedNewEmi, tc.income);
 
       const result = await orchestrateDecision(
         {
@@ -67,8 +68,8 @@ describe('Quantitative Audit & Performance Benchmark', () => {
         DEFAULT_POLICY
       );
 
-      const diff = Math.abs(result.foir - expectedFoir * 100);
-      console.log(`[FOIR TEST] Case ${idx+1}: Expected ${(expectedFoir * 100).toFixed(1)}%, Engine ${result.foir.toFixed(1)}% (diff: ${diff.toFixed(2)}%)`);
+      const diff = Math.abs(result.foir - expectedFoirPercent);
+      console.log(`[FOIR TEST] Case ${idx+1}: Expected ${expectedFoirPercent.toFixed(1)}%, Engine ${result.foir.toFixed(1)}% (diff: ${diff.toFixed(2)}%)`);
       expect(diff).toBeLessThan(0.2);
     }
   });

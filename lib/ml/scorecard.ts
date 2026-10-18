@@ -62,7 +62,7 @@ export function runScorecardInference(
       label: 'Net Monthly Earnings',
       impact: applicant.monthlyIncome >= 4000 ? 'positive' : 'neutral',
       weight: parseFloat(incomeImpact.toFixed(3)),
-      description: `Monthly disposable income of $${applicant.monthlyIncome.toLocaleString()} supports steady debt servicing.`,
+      description: `Monthly disposable income of ₹${applicant.monthlyIncome.toLocaleString('en-IN')} supports steady debt servicing.`,
     },
   ];
 

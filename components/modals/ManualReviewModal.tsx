@@ -23,6 +23,7 @@ export function ManualReviewModal({
   const [notes, setNotes] = useState(
     'Underwriting review confirmed compensating asset reserves and clean primary bureau tradelines. Approved with secondary supervisor signoff.'
   );
+  const [reviewToken, setReviewToken] = useState('');
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -34,11 +35,14 @@ export function ManualReviewModal({
     try {
       const res = await fetch(`/api/applications/${applicationId}/review`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${reviewToken.trim()}`,
+        },
         body: JSON.stringify({
           action,
           notes,
-          actor: 'Elena Vance (Risk Operations Lead)',
+          actor: 'Pooja Deshmukh (Risk Underwriting Lead)',
         }),
       });
 
@@ -113,6 +117,23 @@ export function ManualReviewModal({
                   <span>Override to Reject</span>
                 </button>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-label font-label text-ink-700 mb-1">
+                Underwriter Security Key (Bearer Token)
+              </label>
+              <input
+                type="password"
+                required
+                value={reviewToken}
+                onChange={(e) => setReviewToken(e.target.value)}
+                placeholder="Enter server authorization key"
+                className="w-full px-3 py-2 rounded-lg bg-ivory-50 border border-border text-body-compact text-ink-900 focus:outline-none focus:border-forest-900"
+              />
+              <p className="text-caption text-ink-500 mt-1">
+                Must match the server REVIEW_API_KEY environment variable.
+              </p>
             </div>
 
             <div>

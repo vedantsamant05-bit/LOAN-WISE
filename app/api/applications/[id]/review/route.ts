@@ -36,7 +36,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await req.json();
-    const { action, notes, actor = 'Elena Vance (Risk Underwriting)' } = body;
+    const { action, notes, actor = 'Pooja Deshmukh (Risk Underwriting)' } = body;
 
     if (!['APPROVE_OVERRIDE', 'REJECT_OVERRIDE'].includes(action)) {
       return NextResponse.json({ error: 'Invalid review action' }, { status: 400 });

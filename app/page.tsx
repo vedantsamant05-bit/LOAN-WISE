@@ -948,7 +948,7 @@ export default function OverviewPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3.5 text-right font-medium text-ink-900 tabular-nums">
-                        ${app.requestedAmount.toLocaleString()}
+                        ₹{app.requestedAmount.toLocaleString('en-IN')}
                       </td>
                       <td className="px-4 py-3.5 text-center">
                         {app.decision?.scorecard?.score ? (

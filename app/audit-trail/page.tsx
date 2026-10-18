@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AuditEvent } from '@/lib/types';
+import { formatIndianDate } from '@/lib/utils/formatters';
 
 export default function AuditTrailPage() {
   const [events, setEvents] = useState<AuditEvent[]>([]);
@@ -72,7 +73,7 @@ export default function AuditTrailPage() {
               {events.map((ev) => (
                 <tr key={ev.id} className="hover:bg-ivory-50/60 transition-colors">
                   <td className="px-5 py-3.5 font-mono text-[12px] text-ink-500 whitespace-nowrap">
-                    {new Date(ev.timestamp).toLocaleString()}
+                    {formatIndianDate(ev.timestamp, { includeTime: true })}
                   </td>
                   <td className="px-5 py-3.5">
                     <span className="font-code-pill text-[11px] px-2 py-0.5 rounded font-semibold bg-sage-100 text-forest-900">

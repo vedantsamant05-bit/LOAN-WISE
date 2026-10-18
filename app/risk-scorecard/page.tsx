@@ -30,18 +30,18 @@ export default function RiskScorecardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-body-compact">
           <div className="border-b sm:border-b-0 sm:border-r border-border pb-3 sm:pb-0 sm:pr-4">
             <span className="text-caption text-ink-500 uppercase tracking-wider">Model Artifact</span>
-            <div className="font-semibold text-ink-900 mt-0.5">RiskModel-XGBoost v2.1.4</div>
-            <span className="text-caption text-emerald-600 dark:text-emerald-400 font-medium">Calibrated Logistic Ensemble</span>
+            <div className="font-semibold text-ink-900 mt-0.5">Heuristic Credit-Risk Scorecard v1.0</div>
+            <span className="text-caption text-emerald-600 dark:text-emerald-400 font-medium">Heuristic Logistic Formulation</span>
           </div>
           <div className="border-b sm:border-b-0 md:border-r border-border pb-3 sm:pb-0 sm:pr-4">
             <span className="text-caption text-ink-500 uppercase tracking-wider">Benchmark Dataset</span>
-            <div className="font-semibold text-ink-900 mt-0.5">Kaggle Credit Default (Proxy)</div>
-            <span className="text-caption text-ink-500">150,000 synthetic rows (80/20 split)</span>
+            <div className="font-semibold text-ink-900 mt-0.5">Synthetic India Credit Cohort</div>
+            <span className="text-caption text-ink-500">Illustrative simulation (decision-support prototype)</span>
           </div>
           <div className="border-b sm:border-b-0 sm:border-r border-border pb-3 sm:pb-0 sm:pr-4">
             <span className="text-caption text-ink-500 uppercase tracking-wider">Primary Objective</span>
-            <div className="font-semibold text-ink-900 mt-0.5">Probability of Default (PD)</div>
-            <span className="text-caption text-status-success font-medium">Calibrated Brier: 0.084</span>
+            <div className="font-semibold text-ink-900 mt-0.5">Relative Risk Score &amp; Drivers</div>
+            <span className="text-caption text-status-success font-medium">Explainable Log-Odds Inference</span>
           </div>
           <div>
             <span className="text-caption text-ink-500 uppercase tracking-wider">Production Status</span>
@@ -56,38 +56,37 @@ export default function RiskScorecardPage() {
         {/* Performance Metrics */}
         <div className="lg:col-span-6 bg-white rounded-xl p-space-lg shadow-sm border border-border">
           <h2 className="font-section-title text-section-title font-semibold text-ink-900 mb-1">
-            Measured Evaluation Metrics (Held-out Test Set)
+            Simulated Benchmark Calibration Metrics (Illustrative Test Set)
           </h2>
           <p className="text-caption text-ink-500 mb-4">
-            Reported values strictly measured on fixed seed validation split.
+            Illustrative performance metrics simulated on a synthetic validation cohort.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mb-6">
             <div className="p-3 bg-ivory-50 dark:bg-[#16231a] rounded-lg border border-border">
-              <span className="text-caption text-ink-500 uppercase tracking-wider">ROC-AUC</span>
+              <span className="text-caption text-ink-500 uppercase tracking-wider">ROC-AUC (Simulated)</span>
               <div className="text-display font-semibold text-ink-900 dark:text-emerald-400 tabular-nums">0.832</div>
-              <span className="text-[11px] text-status-success font-medium">+0.04 over baseline logistic</span>
+              <span className="text-[11px] text-status-success font-medium">Illustrative separation</span>
             </div>
             <div className="p-3 bg-ivory-50 dark:bg-[#16231a] rounded-lg border border-border">
-              <span className="text-caption text-ink-500 uppercase tracking-wider">PR-AUC</span>
+              <span className="text-caption text-ink-500 uppercase tracking-wider">PR-AUC (Simulated)</span>
               <div className="text-display font-semibold text-ink-900 dark:text-emerald-400 tabular-nums">0.684</div>
-              <span className="text-[11px] text-ink-500">Class imbalance adjusted</span>
+              <span className="text-[11px] text-ink-500">Simulated precision floor</span>
             </div>
             <div className="p-3 bg-ivory-50 dark:bg-[#16231a] rounded-lg border border-border">
               <span className="text-caption text-ink-500 uppercase tracking-wider">Precision (at 0.75)</span>
               <div className="text-display font-semibold text-ink-900 dark:text-emerald-400 tabular-nums">78.5%</div>
-              <span className="text-[11px] text-ink-500">Low false positive loans</span>
+              <span className="text-[11px] text-ink-500">Simulated good loan approvals</span>
             </div>
             <div className="p-3 bg-ivory-50 dark:bg-[#16231a] rounded-lg border border-border">
               <span className="text-caption text-ink-500 uppercase tracking-wider">Recall (at 0.75)</span>
               <div className="text-display font-semibold text-ink-900 dark:text-emerald-400 tabular-nums">81.2%</div>
-              <span className="text-[11px] text-ink-500">Default capture rate</span>
+              <span className="text-[11px] text-ink-500">Simulated risk capture</span>
             </div>
           </div>
 
           <div className="p-3 rounded-lg bg-ivory-100 dark:bg-[#1a2b20] border border-border text-caption text-ink-700">
-            <strong>Documentation Guarantee:</strong> In accordance with Section 2, Principle 6 of the project charter,
-            all evaluation numbers come from saved evaluation outputs. No metrics are fabricated.
+            <strong>Model Governance Notice:</strong> LoanWise utilizes an explainable mathematical <strong>Heuristic Credit-Risk Scorecard</strong> based on logistic regression log-odds. Reported metrics above are simulated benchmarks; no empirical production machine-learning model is falsely claimed.
           </div>
         </div>
 
@@ -144,7 +143,7 @@ export default function RiskScorecardPage() {
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-caption font-medium">
             <span className="flex items-center gap-1.5 text-ink-700">
               <span className="w-3 h-0.5 bg-emerald-600 dark:bg-emerald-400"></span>
-              XGBoost Model (AUC = 0.832)
+              Scorecard Model Curve (Simulated)
             </span>
             <span className="flex items-center gap-1.5 text-ink-700">
               <span className="w-3 h-0.5 border-t border-dashed border-ink-500"></span>

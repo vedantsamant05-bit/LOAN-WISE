@@ -14,6 +14,7 @@ import {
   defaultSimulationSettings,
 } from '../integrations';
 import { runScorecardInference } from '../ml/scorecard';
+import { calculateAmortizedEMI, calculateFOIR } from '../utils/formatters';
 
 export async function orchestrateDecision(
   applicant: ApplicantData,
@@ -25,23 +26,21 @@ export async function orchestrateDecision(
   const decisionId = `DEC-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
   const appId = applicant.id || `APP-${Math.floor(1000 + Math.random() * 9000)}`;
 
-  // 1. Calculate EMI using standard reducing-balance formula: EMI = P * r * (1+r)^n / ((1+r)^n - 1)
-  // Monthly interest rate derived from policy annual rate; falls back to 12% p.a. if not configured.
+  // 1. Calculate EMI using centralized standard reducing-balance formula:
+  // EMI = P * r * (1+r)^n / ((1+r)^n - 1)
   const annualRate = policy.defaultAnnualInterestRate ?? 0.12;
-  const monthlyRate = annualRate / 12;
-  const n = applicant.tenureMonths;
-  const P = applicant.requestedAmount;
-  let estimatedNewEmi: number;
-  if (monthlyRate === 0 || n === 0) {
-    estimatedNewEmi = n > 0 ? P / n : 0;
-  } else {
-    const powFactor = Math.pow(1 + monthlyRate, n);
-    estimatedNewEmi = (P * monthlyRate * powFactor) / (powFactor - 1);
-  }
-  const totalMonthlyDebt = applicant.existingMonthlyObligations + estimatedNewEmi;
-  const foir = applicant.monthlyIncome > 0 ? totalMonthlyDebt / applicant.monthlyIncome : 1.0;
-  const foirPercent = parseFloat((foir * 100).toFixed(1));
-  const emiRounded = parseFloat(estimatedNewEmi.toFixed(2));
+  const estimatedNewEmi = calculateAmortizedEMI(
+    applicant.requestedAmount,
+    annualRate,
+    applicant.tenureMonths
+  );
+  const emiRounded = estimatedNewEmi;
+  const foirPercent = calculateFOIR(
+    applicant.existingMonthlyObligations,
+    estimatedNewEmi,
+    applicant.monthlyIncome
+  );
+  const foir = foirPercent / 100;
 
   // 2. Fetch Dependencies with failure simulation
   const bureauRes = await callBureauService(applicant, simSettings.bureauStatus);
@@ -157,8 +156,8 @@ export async function orchestrateDecision(
     } else if (rule.id === 'R08') {
       // Soft: Requested amount cap (> 10x monthly income)
       const maxAllowed = applicant.monthlyIncome * (rule.params.maxIncomeMultiplier || 10);
-      observedValue = `$${applicant.requestedAmount.toLocaleString()}`;
-      threshold = `<= $${maxAllowed.toLocaleString()} (${rule.params.maxIncomeMultiplier}x income)`;
+      observedValue = `₹${applicant.requestedAmount.toLocaleString('en-IN')}`;
+      threshold = `<= ₹${maxAllowed.toLocaleString('en-IN')} (${rule.params.maxIncomeMultiplier}x income)`;
       passed = applicant.requestedAmount <= maxAllowed;
     }
 

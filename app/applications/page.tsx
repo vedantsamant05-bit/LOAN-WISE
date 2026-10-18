@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { GeneralLogo } from '@/components/ui/GeneralLogo';
 import { NewApplicationModal } from '@/components/modals/NewApplicationModal';
 import { Application } from '@/lib/types';
+import { formatIndianDate } from '@/lib/utils/formatters';
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -159,7 +160,7 @@ export default function ApplicationsPage() {
                       {app.id}
                     </Link>
                     <div className="text-[11px] text-ink-500 font-sans">
-                      {new Date(app.createdAt).toLocaleDateString()}
+                      {formatIndianDate(app.createdAt)}
                     </div>
                   </td>
 
@@ -179,7 +180,7 @@ export default function ApplicationsPage() {
 
                   <td className="px-5 py-4 text-right">
                     <div className="font-semibold text-ink-900 tabular-nums">
-                      ${app.requestedAmount.toLocaleString()}
+                      ₹{app.requestedAmount.toLocaleString('en-IN')}
                     </div>
                     <div className="text-caption text-ink-500">{app.tenureMonths} months term</div>
                   </td>

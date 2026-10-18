@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { calculateAmortizedEMI, calculateFOIR, formatINR } from '@/lib/utils/formatters';
 
 export default function DecisionEnginePage() {
   const [sandboxData, setSandboxData] = useState({
     age: 32,
-    income: 5200,
-    obligations: 2693,
-    facility: 12500,
+    income: 52000,
+    obligations: 26936,
+    facility: 500000,
     tenure: 36,
     bureauScore: 738,
     hasWriteOff: false,
@@ -15,9 +16,9 @@ export default function DecisionEnginePage() {
     kycMatch: true,
   });
 
-  // Real-time calculation
-  const newEmi = (sandboxData.facility / sandboxData.tenure) * 1.15;
-  const foir = ((sandboxData.obligations + newEmi) / sandboxData.income) * 100;
+  // Real-time reducing-balance EMI and FOIR calculation
+  const newEmi = calculateAmortizedEMI(sandboxData.facility, 0.12, sandboxData.tenure);
+  const foir = calculateFOIR(sandboxData.obligations, newEmi, sandboxData.income);
 
   // Real-time trace
   const hardStopAge = sandboxData.age < 21 || sandboxData.age > 60;
@@ -153,7 +154,7 @@ export default function DecisionEnginePage() {
               />
             </div>
             <div>
-              <label className="block text-label text-ink-700 mb-1">Monthly Net Income ($)</label>
+              <label className="block text-label text-ink-700 mb-1">Monthly Net Income (₹)</label>
               <input
                 type="number"
                 value={sandboxData.income}
@@ -162,7 +163,7 @@ export default function DecisionEnginePage() {
               />
             </div>
             <div>
-              <label className="block text-label text-ink-700 mb-1">Existing Monthly Obligations ($)</label>
+              <label className="block text-label text-ink-700 mb-1">Existing Monthly Obligations (₹)</label>
               <input
                 type="number"
                 value={sandboxData.obligations}
@@ -173,7 +174,7 @@ export default function DecisionEnginePage() {
               />
             </div>
             <div>
-              <label className="block text-label text-ink-700 mb-1">Requested Facility Amount ($)</label>
+              <label className="block text-label text-ink-700 mb-1">Requested Facility Amount (₹)</label>
               <input
                 type="number"
                 value={sandboxData.facility}

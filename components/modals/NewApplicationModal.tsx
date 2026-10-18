@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { calculateAmortizedEMI, calculateFOIR } from '@/lib/utils/formatters';
 
 interface NewApplicationModalProps {
   isOpen: boolean;
@@ -12,25 +13,32 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: 'Sarah Jenkins',
+    name: 'Anjali Sharma',
     age: 32,
-    city: 'Denver, CO',
+    city: 'Mumbai, MH',
     employmentType: 'Salaried',
-    monthlyIncome: 5200,
-    declaredIncome: 5200,
-    requestedAmount: 12500,
+    monthlyIncome: 52000,
+    declaredIncome: 52000,
+    requestedAmount: 500000,
     tenureMonths: 36,
-    existingMonthlyObligations: 2693,
+    existingMonthlyObligations: 26936,
     panNumber: 'ABCDE1234F',
     simulationScenario: 'NORMAL', // NORMAL | ADVERSE_BUREAU | TIMEOUT | INCOME_MISMATCH | KYC_MISMATCH
   });
 
   if (!isOpen) return null;
 
-  // Realtime calculated FOIR
-  const estimatedNewEmi = (formData.requestedAmount / formData.tenureMonths) * 1.15;
-  const totalDebt = formData.existingMonthlyObligations + estimatedNewEmi;
-  const estimatedFoir = formData.monthlyIncome > 0 ? (totalDebt / formData.monthlyIncome) * 100 : 0;
+  // Realtime calculated reducing-balance EMI and FOIR
+  const estimatedNewEmi = calculateAmortizedEMI(
+    formData.requestedAmount,
+    0.12,
+    formData.tenureMonths
+  );
+  const estimatedFoir = calculateFOIR(
+    formData.existingMonthlyObligations,
+    estimatedNewEmi,
+    formData.monthlyIncome
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +190,7 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
                   </div>
                   <div>
                     <label className="block text-label font-label text-ink-700 mb-1">
-                      Net Monthly Income ($)
+                      Net Monthly Income (₹)
                     </label>
                     <input
                       type="number"
@@ -196,7 +204,7 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
                   </div>
                   <div>
                     <label className="block text-label font-label text-ink-700 mb-1">
-                      Existing Monthly Debt / EMIs ($)
+                      Existing Monthly Debt / EMIs (₹)
                     </label>
                     <input
                       type="number"
@@ -213,7 +221,7 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
                   </div>
                   <div>
                     <label className="block text-label font-label text-ink-700 mb-1">
-                      Requested Facility Amount ($)
+                      Requested Facility Amount (₹)
                     </label>
                     <input
                       type="number"

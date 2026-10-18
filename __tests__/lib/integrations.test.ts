@@ -14,7 +14,7 @@ import type { ApplicantData } from '../../lib/types';
 const BASE_APPLICANT: ApplicantData = {
   name: 'Marcus Chen',
   age: 38,
-  city: 'Seattle, WA',
+  city: 'Bengaluru, KA',
   employmentType: 'Salaried',
   monthlyIncome: 8500,
   requestedAmount: 25000,
