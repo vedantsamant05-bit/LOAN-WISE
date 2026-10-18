@@ -104,5 +104,6 @@ export const DEFAULT_POLICY: PolicyConfig = {
   dependencies: {
     timeoutSeconds: 3,
     maxRetries: 2
-  }
+  },
+  defaultAnnualInterestRate: 0.12  // 12% p.a. used in reducing-balance EMI calculation
 };

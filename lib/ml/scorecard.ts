@@ -69,8 +69,8 @@ export function runScorecardInference(
   return {
     score: parseFloat(score.toFixed(4)),
     defaultProbability: parseFloat(defaultProbability.toFixed(4)),
-    modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-    modelType: 'Ensemble Logistic Regression Scorecard',
+    modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+    modelType: 'Heuristic Logistic Scorecard',
     drivers,
   };
 }

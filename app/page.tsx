@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { GeneralLogo } from '@/components/ui/GeneralLogo';
@@ -89,19 +89,300 @@ export default function OverviewPage() {
     if (loanProduct === 'BUSINESS' && app.applicant.employmentType !== 'Business' && app.applicant.employmentType !== 'Self-Employed') return false;
 
     // Time range filtering
-    if (timeRange === 'today') {
-      const diffHours = (Date.now() - new Date(app.createdAt).getTime()) / (1000 * 3600);
-      if (diffHours > 24) return false;
-    } else if (timeRange === '7d') {
-      const diffDays = (Date.now() - new Date(app.createdAt).getTime()) / (1000 * 3600 * 24);
-      if (diffDays > 7) return false;
-    } else if (timeRange === '30d') {
-      const diffDays = (Date.now() - new Date(app.createdAt).getTime()) / (1000 * 3600 * 24);
-      if (diffDays > 30) return false;
+    if (app.createdAt) {
+      const createdTime = new Date(app.createdAt).getTime();
+      if (!isNaN(createdTime)) {
+        const diffHours = (Date.now() - createdTime) / (1000 * 3600);
+        if (timeRange === 'today' && diffHours > 24) return false;
+        if (timeRange === '7d' && diffHours > 24 * 7) return false;
+        if (timeRange === '30d' && diffHours > 24 * 30) return false;
+        if (timeRange === '90d' && diffHours > 24 * 90) return false;
+      }
     }
 
     return true;
   });
+
+  // Dynamic cohort metrics reacting in real-time to active filter dropdowns
+  const cohortMetrics = useMemo(() => {
+    // 1. Base Volume by Time Range
+    let baseVolume = 12482;
+    let cohortPeriodLabel = 'last 30-day cohort';
+    let dailyAvgDays = 30;
+    let volumeDelta = '+8.4%';
+
+    if (timeRange === 'today') {
+      baseVolume = 416;
+      cohortPeriodLabel = 'previous 24h window';
+      dailyAvgDays = 1;
+      volumeDelta = '+3.2%';
+    } else if (timeRange === '7d') {
+      baseVolume = 2912;
+      cohortPeriodLabel = 'previous 7-day cohort';
+      dailyAvgDays = 7;
+      volumeDelta = '+5.7%';
+    } else if (timeRange === '30d') {
+      baseVolume = 12482;
+      cohortPeriodLabel = 'last 30-day cohort';
+      dailyAvgDays = 30;
+      volumeDelta = '+8.4%';
+    } else if (timeRange === '90d') {
+      baseVolume = 37450;
+      cohortPeriodLabel = 'previous 90-day cohort';
+      dailyAvgDays = 90;
+      volumeDelta = '+11.2%';
+    } else if (timeRange === 'ALL') {
+      baseVolume = 84200;
+      cohortPeriodLabel = 'all-time benchmark';
+      dailyAvgDays = 180;
+      volumeDelta = '+14.6%';
+    }
+
+    // 2. Product Share Multipliers
+    let productShare = 1.0;
+    let productApprAdj = 0.0;
+    let productRefAdj = 0.0;
+    if (loanProduct === 'PERSONAL') {
+      productShare = 0.46;
+      productApprAdj = -3.2;
+      productRefAdj = 1.8;
+    } else if (loanProduct === 'SALARY') {
+      productShare = 0.34;
+      productApprAdj = 4.8;
+      productRefAdj = -2.6;
+    } else if (loanProduct === 'BUSINESS') {
+      productShare = 0.20;
+      productApprAdj = -4.5;
+      productRefAdj = 5.2;
+    }
+
+    // 3. Risk Tier Multiplier & Characteristics
+    let tierShare = 1.0;
+    let baseApprovalRate = 64.2;
+    let baseReferralRate = 21.4;
+    let baseTat = 1.24;
+    let tatDelta = '-140ms';
+    let approvalDelta = '+1.8%';
+    let referralDelta = '-0.6%';
+
+    let topTriggers = [
+      {
+        code: 'FOIR_BORDERLINE',
+        rule: 'R05 Borderline FOIR (50–65%)',
+        count: '342 cases',
+        severity: 'Soft Rule (Refer)',
+        color: 'text-status-warning bg-status-warning-bg',
+      },
+      {
+        code: 'THIN_CREDIT_HISTORY',
+        rule: 'Scorecard: Tradelines < 3 yrs',
+        count: '189 cases',
+        severity: 'ML Factor (Refer)',
+        color: 'text-status-warning bg-status-warning-bg',
+      },
+      {
+        code: 'INCOME_MISMATCH',
+        rule: 'R06 Income Variance > 15%',
+        count: '124 cases',
+        severity: 'Soft Rule (Refer)',
+        color: 'text-status-warning bg-status-warning-bg',
+      },
+      {
+        code: 'FOIR_ABOVE_CEILING',
+        rule: 'R04 FOIR > 65% Hard Ceiling',
+        count: '98 cases',
+        severity: 'Hard Stop (Reject)',
+        color: 'text-status-danger bg-status-danger-bg',
+      },
+    ];
+
+    if (riskTier === 'TIER1') {
+      tierShare = 0.54;
+      baseApprovalRate = 89.2;
+      baseReferralRate = 8.4;
+      baseTat = 0.82;
+      tatDelta = '-320ms';
+      approvalDelta = '+5.4%';
+      referralDelta = '-2.1%';
+      topTriggers = [
+        {
+          code: 'AMOUNT_ABOVE_CAP',
+          rule: 'R08 High Facility Multiplier (>10x salary)',
+          count: '42 cases',
+          severity: 'Soft Rule (Refer)',
+          color: 'text-status-warning bg-status-warning-bg',
+        },
+        {
+          code: 'FOIR_BORDERLINE',
+          rule: 'R05 Borderline FOIR (50–52% edge)',
+          count: '28 cases',
+          severity: 'Soft Rule (Refer)',
+          color: 'text-status-warning bg-status-warning-bg',
+        },
+        {
+          code: 'INCOME_DISCREPANCY',
+          rule: 'R06 Employer Variance (>10%)',
+          count: '15 cases',
+          severity: 'Verification',
+          color: 'text-status-warning bg-status-warning-bg',
+        },
+      ];
+    } else if (riskTier === 'TIER2') {
+      tierShare = 0.31;
+      baseApprovalRate = 51.4;
+      baseReferralRate = 36.2;
+      baseTat = 1.48;
+      tatDelta = '+110ms';
+      approvalDelta = '-2.4%';
+      referralDelta = '+3.8%';
+      topTriggers = [
+        {
+          code: 'FOIR_BORDERLINE',
+          rule: 'R05 Borderline FOIR (50–65%)',
+          count: '418 cases',
+          severity: 'Soft Rule (Refer)',
+          color: 'text-status-warning bg-status-warning-bg',
+        },
+        {
+          code: 'THIN_TRADELINE',
+          rule: 'Thin Bureau History (<3 yrs)',
+          count: '265 cases',
+          severity: 'Scorecard Driver',
+          color: 'text-status-warning bg-status-warning-bg',
+        },
+        {
+          code: 'INCOME_MISMATCH',
+          rule: 'R06 Income Variance (>15%)',
+          count: '188 cases',
+          severity: 'Soft Rule (Refer)',
+          color: 'text-status-warning bg-status-warning-bg',
+        },
+      ];
+    } else if (riskTier === 'TIER3') {
+      tierShare = 0.15;
+      baseApprovalRate = 14.8;
+      baseReferralRate = 23.5;
+      baseTat = 0.65;
+      tatDelta = '-480ms';
+      approvalDelta = '-18.2%';
+      referralDelta = '+1.4%';
+      topTriggers = [
+        {
+          code: 'BUREAU_SCORE_BELOW_MIN',
+          rule: 'R03 Credit Score Cutoff (<650)',
+          count: '512 cases',
+          severity: 'Hard Stop (Decline)',
+          color: 'text-status-danger bg-status-danger-bg',
+        },
+        {
+          code: 'FOIR_ABOVE_CEILING',
+          rule: 'R04 Hard Ceiling FOIR (>65%)',
+          count: '376 cases',
+          severity: 'Hard Stop (Decline)',
+          color: 'text-status-danger bg-status-danger-bg',
+        },
+        {
+          code: 'KYC_MISMATCH',
+          rule: 'R07 KYC Name & PAN Discrepancy',
+          count: '142 cases',
+          severity: 'Policy Stop',
+          color: 'text-status-danger bg-status-danger-bg',
+        },
+      ];
+    }
+
+    // Final Rates computation
+    let rawApproval = Math.min(96, Math.max(8, baseApprovalRate + productApprAdj));
+    let rawReferral = Math.min(60, Math.max(4, baseReferralRate + productRefAdj));
+    let rawDecline = Math.max(2, 100 - rawApproval - rawReferral - 2.0);
+    let rawPending = Math.max(0.5, 100 - rawApproval - rawReferral - rawDecline);
+
+    const approvalRate = parseFloat(rawApproval.toFixed(1));
+    const referralRate = parseFloat(rawReferral.toFixed(1));
+    const declineRate = parseFloat(rawDecline.toFixed(1));
+    const pendingRate = parseFloat((100 - approvalRate - referralRate - declineRate).toFixed(1));
+
+    // Cohort Total Volume
+    const totalApplications = Math.max(1, Math.round(baseVolume * productShare * tierShare));
+
+    // Breakdown Counts
+    const approvedCount = Math.round(totalApplications * (approvalRate / 100));
+    const referredCount = Math.round(totalApplications * (referralRate / 100));
+    const declinedCount = Math.round(totalApplications * (declineRate / 100));
+    const pendingCount = Math.max(0, totalApplications - approvedCount - referredCount - declinedCount);
+
+    // Dynamic Stacked Bar Chart with daily variation reflecting this cohort
+    const dailyBars = [
+      { day: 'Mon', a: Math.min(95, Math.max(5, Math.round(approvalRate + 1))), r: Math.min(50, Math.max(4, Math.round(referralRate - 1))), d: 0 },
+      { day: 'Tue', a: Math.min(95, Math.max(5, Math.round(approvalRate + 4))), r: Math.min(50, Math.max(4, Math.round(referralRate - 2))), d: 0 },
+      { day: 'Wed', a: Math.min(95, Math.max(5, Math.round(approvalRate - 2))), r: Math.min(50, Math.max(4, Math.round(referralRate + 3))), d: 0 },
+      { day: 'Thu', a: Math.min(95, Math.max(5, Math.round(approvalRate + 3))), r: Math.min(50, Math.max(4, Math.round(referralRate - 1))), d: 0 },
+      { day: 'Fri', a: Math.min(95, Math.max(5, Math.round(approvalRate - 4))), r: Math.min(50, Math.max(4, Math.round(referralRate + 4))), d: 0 },
+      { day: 'Sat', a: Math.min(95, Math.max(5, Math.round(approvalRate - 5))), r: Math.min(50, Math.max(4, Math.round(referralRate + 5))), d: 0 },
+      { day: 'Sun', a: Math.min(95, Math.max(5, Math.round(approvalRate))), r: Math.min(50, Math.max(4, Math.round(referralRate))), d: 0 },
+      { day: 'Today', a: Math.min(95, Math.max(5, Math.round(approvalRate + 2))), r: Math.min(50, Math.max(4, Math.round(referralRate - 1))), d: 0 },
+    ].map((col) => {
+      const d = Math.max(3, 100 - col.a - col.r);
+      return { ...col, d };
+    });
+
+    const dailyAverage = Math.max(1, Math.round(totalApplications / dailyAvgDays));
+    const queueCases = Math.max(2, Math.round(referredCount * 0.018));
+
+    const outcomeItems = [
+      {
+        label: 'Direct Approved',
+        val: approvedCount.toLocaleString(),
+        pct: `${approvalRate.toFixed(1)}%`,
+        color: 'bg-status-success dark:bg-emerald-500',
+        badge: 'Fast-Track Pass',
+      },
+      {
+        label: 'Referred for Review',
+        val: referredCount.toLocaleString(),
+        pct: `${referralRate.toFixed(1)}%`,
+        color: 'bg-status-warning dark:bg-amber-400',
+        badge: 'Manual Queue',
+      },
+      {
+        label: 'Hard Stop Declines',
+        val: declinedCount.toLocaleString(),
+        pct: `${declineRate.toFixed(1)}%`,
+        color: 'bg-status-danger dark:bg-rose-500',
+        badge: 'Policy Stop',
+      },
+      {
+        label: 'Pending Verification',
+        val: pendingCount.toLocaleString(),
+        pct: `${pendingRate.toFixed(1)}%`,
+        color: 'bg-status-neutral dark:bg-slate-400',
+        badge: 'Gateway Retry',
+      },
+    ];
+
+    return {
+      totalApplications,
+      approvalRate,
+      referralRate,
+      declineRate,
+      pendingRate,
+      tat: `${baseTat.toFixed(2)}s`,
+      tatDelta,
+      volumeDelta,
+      approvalDelta,
+      referralDelta,
+      cohortPeriodLabel,
+      queueCases,
+      approvedCount,
+      referredCount,
+      declinedCount,
+      pendingCount,
+      dailyBars,
+      dailyAverage,
+      topTriggers,
+      outcomeItems,
+    };
+  }, [timeRange, loanProduct, riskTier]);
 
   return (
     <div className="flex flex-col w-full">
@@ -341,6 +622,12 @@ export default function OverviewPage() {
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-2 text-caption font-caption text-ink-500 pt-1 sm:pt-0 border-t sm:border-t-0 border-border">
+            {(timeRange !== '30d' || loanProduct !== 'ALL' || riskTier !== 'ALL') && (
+              <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-300 font-medium text-xs border border-amber-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                Cohort Filter Active
+              </span>
+            )}
             <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-sage-100 text-forest-900 font-body-compact-medium text-xs">
               <span className="material-symbols-outlined text-[14px] text-sage-700">verified_user</span>
               Policy: v4.2-active
@@ -363,13 +650,13 @@ export default function OverviewPage() {
           <div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="font-display text-display text-ink-900 font-semibold tracking-tight tabular-nums">
-                12,482
+                {cohortMetrics.totalApplications.toLocaleString()}
               </span>
               <span className="inline-flex items-center text-status-success font-label text-label font-medium bg-status-success-bg px-1.5 py-0.5 rounded border border-status-success/20">
-                +8.4%
+                {cohortMetrics.volumeDelta}
               </span>
             </div>
-            <p className="font-caption text-caption text-ink-500">vs last 30-day cohort</p>
+            <p className="font-caption text-caption text-ink-500">vs {cohortMetrics.cohortPeriodLabel}</p>
           </div>
           <div className="mt-space-md pt-space-xs">
             <svg className="w-full h-8 text-emerald-600 dark:text-emerald-400" fill="none" preserveAspectRatio="none" viewBox="0 0 100 24">
@@ -390,10 +677,14 @@ export default function OverviewPage() {
           <div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="font-display text-display text-ink-900 font-semibold tracking-tight tabular-nums">
-                64.2%
+                {cohortMetrics.approvalRate.toFixed(1)}%
               </span>
-              <span className="inline-flex items-center text-status-success font-label text-label font-medium bg-status-success-bg px-1.5 py-0.5 rounded border border-status-success/20">
-                +1.8%
+              <span className={`inline-flex items-center font-label text-label font-medium px-1.5 py-0.5 rounded border ${
+                cohortMetrics.approvalRate >= 60
+                  ? 'text-status-success bg-status-success-bg border-status-success/20'
+                  : 'text-status-danger bg-status-danger-bg border-status-danger/20'
+              }`}>
+                {cohortMetrics.approvalDelta}
               </span>
             </div>
             <p className="font-caption text-caption text-ink-500">Target threshold: 62.0%</p>
@@ -417,13 +708,13 @@ export default function OverviewPage() {
           <div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="font-display text-display text-ink-900 font-semibold tracking-tight tabular-nums">
-                21.4%
+                {cohortMetrics.referralRate.toFixed(1)}%
               </span>
               <span className="inline-flex items-center text-status-warning font-label text-label font-medium bg-status-warning-bg px-1.5 py-0.5 rounded border border-status-warning/20">
-                -0.6%
+                {cohortMetrics.referralDelta}
               </span>
             </div>
-            <p className="font-caption text-caption text-ink-500">Underwriting queue: 48 cases</p>
+            <p className="font-caption text-caption text-ink-500">Underwriting queue: {cohortMetrics.queueCases} cases</p>
           </div>
           <div className="mt-space-md pt-space-xs">
             <svg className="w-full h-8 text-amber-600 dark:text-amber-400" fill="none" preserveAspectRatio="none" viewBox="0 0 100 24">
@@ -444,10 +735,10 @@ export default function OverviewPage() {
           <div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="font-display text-display text-ink-900 font-semibold tracking-tight tabular-nums">
-                1.24s
+                {cohortMetrics.tat}
               </span>
               <span className="inline-flex items-center text-status-success font-label text-label font-medium bg-status-success-bg px-1.5 py-0.5 rounded border border-status-success/20">
-                -140ms
+                {cohortMetrics.tatDelta}
               </span>
             </div>
             <p className="font-caption text-caption text-ink-500">SLA ceiling: 3.00s</p>
@@ -477,31 +768,22 @@ export default function OverviewPage() {
             <div className="flex items-center gap-4 text-caption">
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-status-success"></span>
-                <span>Approved (64%)</span>
+                <span>Approved ({cohortMetrics.approvalRate.toFixed(0)}%)</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-status-warning"></span>
-                <span>Referred (21%)</span>
+                <span>Referred ({cohortMetrics.referralRate.toFixed(0)}%)</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-status-danger"></span>
-                <span>Declined (15%)</span>
+                <span>Declined ({cohortMetrics.declineRate.toFixed(0)}%)</span>
               </span>
             </div>
           </div>
 
           {/* Stacked Bar Chart Simulation */}
           <div className="h-56 w-full flex items-end gap-3 pt-6 pb-2 border-b border-border">
-            {[
-              { day: 'Mon', a: 65, r: 20, d: 15 },
-              { day: 'Tue', a: 70, r: 18, d: 12 },
-              { day: 'Wed', a: 62, r: 24, d: 14 },
-              { day: 'Thu', a: 68, r: 19, d: 13 },
-              { day: 'Fri', a: 60, r: 25, d: 15 },
-              { day: 'Sat', a: 58, r: 27, d: 15 },
-              { day: 'Sun', a: 64, r: 22, d: 14 },
-              { day: 'Today', a: 67, r: 20, d: 13 },
-            ].map((col, idx) => (
+            {cohortMetrics.dailyBars.map((col, idx) => (
               <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
                 <div className="w-full max-w-[42px] flex flex-col gap-0.5 rounded-t overflow-hidden h-full justify-end bg-ivory-100/60 dark:bg-[#1a2b1f] p-0.5 border border-transparent group-hover:border-border transition-colors">
                   <div style={{ height: `${col.d}%` }} className="bg-status-danger dark:bg-rose-500/90 w-full rounded-t-sm" title={`Declined: ${col.d}%`}></div>
@@ -513,7 +795,7 @@ export default function OverviewPage() {
             ))}
           </div>
           <div className="flex items-center justify-between pt-3 text-caption text-ink-500">
-            <span>Average 416 daily applications evaluated</span>
+            <span>Average {cohortMetrics.dailyAverage.toLocaleString()} daily applications evaluated</span>
             <span className="text-forest-900 font-medium cursor-pointer hover:underline">
               View historical cohort data &rarr;
             </span>
@@ -527,41 +809,12 @@ export default function OverviewPage() {
               Outcome Breakdown
             </h2>
             <p className="font-caption text-caption text-ink-500">
-              Portfolio split across current policy effective window
+              Portfolio split across {cohortMetrics.cohortPeriodLabel}
             </p>
           </div>
 
           <div className="flex flex-col gap-4">
-            {[
-              {
-                label: 'Direct Approved',
-                val: '8,013',
-                pct: '64.2%',
-                color: 'bg-status-success dark:bg-emerald-500',
-                badge: 'Fast-Track Pass',
-              },
-              {
-                label: 'Referred for Review',
-                val: '2,671',
-                pct: '21.4%',
-                color: 'bg-status-warning dark:bg-amber-400',
-                badge: 'Manual Queue',
-              },
-              {
-                label: 'Hard Stop Declines',
-                val: '1,548',
-                pct: '12.4%',
-                color: 'bg-status-danger dark:bg-rose-500',
-                badge: 'Policy Stop',
-              },
-              {
-                label: 'Pending Verification',
-                val: '250',
-                pct: '2.0%',
-                color: 'bg-status-neutral dark:bg-slate-400',
-                badge: 'Gateway Retry',
-              },
-            ].map((item, idx) => (
+            {cohortMetrics.outcomeItems.map((item, idx) => (
               <div key={idx} className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between text-body-compact">
                   <span className="font-medium text-ink-900 flex items-center gap-2">
@@ -595,48 +848,12 @@ export default function OverviewPage() {
               Top Referral &amp; Decline Triggers
             </h2>
             <p className="font-caption text-caption text-ink-500">
-              Most frequent rule triggers across last 1,000 cases
+              Most frequent rule triggers across {cohortMetrics.cohortPeriodLabel}
             </p>
           </div>
 
           <div className="space-y-3">
-            {[
-              {
-                code: 'FOIR_BORDERLINE',
-                rule: 'R05 Borderline FOIR (50–65%)',
-                count: '342 cases',
-                severity: 'Soft Rule (Refer)',
-                color: 'text-status-warning bg-status-warning-bg',
-              },
-              {
-                code: 'THIN_CREDIT_HISTORY',
-                rule: 'Scorecard: Tradelines < 3 yrs',
-                count: '189 cases',
-                severity: 'ML Factor (Refer)',
-                color: 'text-status-warning bg-status-warning-bg',
-              },
-              {
-                code: 'INCOME_MISMATCH',
-                rule: 'R06 Income Variance > 15%',
-                count: '124 cases',
-                severity: 'Soft Rule (Refer)',
-                color: 'text-status-warning bg-status-warning-bg',
-              },
-              {
-                code: 'FOIR_ABOVE_CEILING',
-                rule: 'R04 FOIR > 65% Hard Ceiling',
-                count: '98 cases',
-                severity: 'Hard Stop (Reject)',
-                color: 'text-status-danger bg-status-danger-bg',
-              },
-              {
-                code: 'ADVERSE_BUREAU_HISTORY',
-                rule: 'R02 Active Write-Off or Default',
-                count: '64 cases',
-                severity: 'Hard Stop (Reject)',
-                color: 'text-status-danger bg-status-danger-bg',
-              },
-            ].map((t, idx) => (
+            {cohortMetrics.topTriggers.map((t, idx) => (
               <div
                 key={idx}
                 className="p-3 rounded-lg bg-ivory-50 border border-border flex items-center justify-between"

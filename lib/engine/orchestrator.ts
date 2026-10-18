@@ -25,12 +25,23 @@ export async function orchestrateDecision(
   const decisionId = `DEC-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
   const appId = applicant.id || `APP-${Math.floor(1000 + Math.random() * 9000)}`;
 
-  // 1. Calculate FOIR (Fixed Obligation to Income Ratio)
-  // Monthly obligations + Estimated new EMI (estimated at ~3.2% of requested amount for standard ~36m unsecured personal loan)
-  const estimatedNewEmi = (applicant.requestedAmount / applicant.tenureMonths) * 1.15;
+  // 1. Calculate EMI using standard reducing-balance formula: EMI = P * r * (1+r)^n / ((1+r)^n - 1)
+  // Monthly interest rate derived from policy annual rate; falls back to 12% p.a. if not configured.
+  const annualRate = policy.defaultAnnualInterestRate ?? 0.12;
+  const monthlyRate = annualRate / 12;
+  const n = applicant.tenureMonths;
+  const P = applicant.requestedAmount;
+  let estimatedNewEmi: number;
+  if (monthlyRate === 0 || n === 0) {
+    estimatedNewEmi = n > 0 ? P / n : 0;
+  } else {
+    const powFactor = Math.pow(1 + monthlyRate, n);
+    estimatedNewEmi = (P * monthlyRate * powFactor) / (powFactor - 1);
+  }
   const totalMonthlyDebt = applicant.existingMonthlyObligations + estimatedNewEmi;
   const foir = applicant.monthlyIncome > 0 ? totalMonthlyDebt / applicant.monthlyIncome : 1.0;
   const foirPercent = parseFloat((foir * 100).toFixed(1));
+  const emiRounded = parseFloat(estimatedNewEmi.toFixed(2));
 
   // 2. Fetch Dependencies with failure simulation
   const bureauRes = await callBureauService(applicant, simSettings.bureauStatus);
@@ -60,15 +71,16 @@ export async function orchestrateDecision(
       reasonCodes: [reasonCode],
       applicantMessage,
       policyVersion: policy.policyVersion,
-      modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
+      modelVersion: 'HeuristicLogistic-Scorecard v1.0',
       tatMs,
       createdAt: new Date().toISOString(),
       foir: foirPercent,
+      emi: emiRounded,
       scorecard: {
         score: 0,
         defaultProbability: 0,
-        modelVersion: 'RiskModel-XGBoost v2.1.4 (Production)',
-        modelType: 'Ensemble Scorecard',
+        modelVersion: 'HeuristicLogistic-Scorecard v1.0',
+        modelType: 'Heuristic Logistic Scorecard',
         drivers: [],
       },
       bureauScore: bureauRes.data?.bureauScore || 0,
@@ -223,6 +235,7 @@ export async function orchestrateDecision(
     tatMs,
     createdAt: new Date().toISOString(),
     foir: foirPercent,
+    emi: emiRounded,
     scorecard,
     bureauScore,
     ruleResults,

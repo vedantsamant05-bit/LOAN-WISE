@@ -137,7 +137,7 @@ describe('ML Scorecard — runScorecardInference', () => {
   describe('Model metadata', () => {
     it('returns correct model version string', () => {
       const result = runScorecardInference(BASE_APPLICANT, 720, 0.40, 4.0);
-      expect(result.modelVersion).toBe('RiskModel-XGBoost v2.1.4 (Production)');
+      expect(result.modelVersion).toBe('HeuristicLogistic-Scorecard v1.0');
     });
 
     it('modelType is a non-empty string', () => {

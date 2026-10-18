@@ -1,0 +1,373 @@
+{
+  "step1": {
+    "httpStatus": 200,
+    "policyVersion": "v4.2-active",
+    "ruleCount": 8,
+    "rules": [
+      {
+        "id": "R01",
+        "name": "Age Eligibility Range",
+        "type": "hard_stop",
+        "params": {
+          "minAge": 21,
+          "maxAge": 60
+        }
+      },
+      {
+        "id": "R02",
+        "name": "Bureau Adverse History Check",
+        "type": "hard_stop",
+        "params": {
+          "allowAdverse": false
+        }
+      },
+      {
+        "id": "R03",
+        "name": "Minimum Credit Bureau Score",
+        "type": "hard_stop",
+        "params": {
+          "minBureauScore": 650
+        }
+      },
+      {
+        "id": "R04",
+        "name": "Hard Ceiling FOIR",
+        "type": "hard_stop",
+        "params": {
+          "maxFoir": 0.65
+        }
+      },
+      {
+        "id": "R05",
+        "name": "Borderline FOIR Band",
+        "type": "soft",
+        "params": {
+          "lower": 0.5,
+          "upper": 0.65
+        }
+      },
+      {
+        "id": "R06",
+        "name": "Income Discrepancy Tolerance",
+        "type": "soft",
+        "params": {
+          "maxVariancePercent": 0.15
+        }
+      },
+      {
+        "id": "R07",
+        "name": "KYC Information Match",
+        "type": "soft",
+        "params": {
+          "requireExactMatch": true
+        }
+      },
+      {
+        "id": "R08",
+        "name": "Facility Multiplier Cap",
+        "type": "soft",
+        "params": {
+          "maxIncomeMultiplier": 10
+        }
+      }
+    ],
+    "scoreBands": {
+      "approveMin": 0.75,
+      "referMin": 0.55
+    },
+    "dependencies": {
+      "timeoutSeconds": 3,
+      "maxRetries": 2
+    }
+  },
+  "step2A_timeout": {
+    "httpStatus": 201,
+    "appId": "APP-6509",
+    "status": "PENDING",
+    "decisionOutcome": "PENDING",
+    "reasonCodes": [
+      "DEPENDENCY_UNAVAILABLE"
+    ],
+    "ruleResultsCount": 0,
+    "dependencyCalls": [
+      {
+        "service": "bureau",
+        "status": "TIMEOUT",
+        "latencyMs": 3100,
+        "attempt": 1,
+        "error": "Gateway Timeout: Credit Bureau API did not respond within 3000ms"
+      },
+      {
+        "service": "kyc",
+        "status": "SUCCESS",
+        "latencyMs": 107,
+        "attempt": 1,
+        "data": {
+          "kycStatus": "VERIFIED",
+          "nameMatchScore": 0.99,
+          "panVerified": true,
+          "addressConfidence": 0.94
+        }
+      },
+      {
+        "service": "income",
+        "status": "SUCCESS",
+        "latencyMs": 165,
+        "attempt": 1,
+        "data": {
+          "verifiedMonthlyIncome": 80000,
+          "declaredMonthlyIncome": 80000,
+          "variancePercent": 0,
+          "averageSalaryCreditDate": 28,
+          "isConsistent": true
+        }
+      }
+    ]
+  },
+  "step2B_adverse": {
+    "httpStatus": 201,
+    "appId": "APP-3366",
+    "status": "REJECT",
+    "decisionOutcome": "REJECT",
+    "reasonCodes": [
+      "ADVERSE_BUREAU_HISTORY",
+      "BUREAU_SCORE_BELOW_MIN"
+    ],
+    "failedHardStops": [
+      {
+        "ruleId": "R02",
+        "name": "Bureau Adverse History Check",
+        "description": "Active write-off, settled accounts, or 90+ DPD overdue on credit bureau.",
+        "type": "hard_stop",
+        "passed": false,
+        "observedValue": "Adverse Delinquency Present",
+        "threshold": "No Adverse Delinquencies",
+        "reasonCode": "ADVERSE_BUREAU_HISTORY"
+      },
+      {
+        "ruleId": "R03",
+        "name": "Minimum Credit Bureau Score",
+        "description": "External credit bureau score must be at or above hard minimum floor.",
+        "type": "hard_stop",
+        "passed": false,
+        "observedValue": 580,
+        "threshold": ">= 650",
+        "reasonCode": "BUREAU_SCORE_BELOW_MIN"
+      }
+    ],
+    "ruleResults": [
+      {
+        "id": "R01",
+        "passed": true,
+        "observed": 29,
+        "threshold": "21 - 60 yrs"
+      },
+      {
+        "id": "R02",
+        "passed": false,
+        "observed": "Adverse Delinquency Present",
+        "threshold": "No Adverse Delinquencies"
+      },
+      {
+        "id": "R03",
+        "passed": false,
+        "observed": 580,
+        "threshold": ">= 650"
+      },
+      {
+        "id": "R04",
+        "passed": true,
+        "observed": "54%",
+        "threshold": "<= 65%"
+      },
+      {
+        "id": "R05",
+        "passed": false,
+        "observed": "54%",
+        "threshold": "< 50% (Borderline: 50% - 65%)"
+      },
+      {
+        "id": "R06",
+        "passed": true,
+        "observed": "0.0% variance",
+        "threshold": "<= 15%"
+      },
+      {
+        "id": "R07",
+        "passed": true,
+        "observed": "Identity Verified",
+        "threshold": "Exact Name & PAN Match"
+      },
+      {
+        "id": "R08",
+        "passed": true,
+        "observed": "$8,00,000",
+        "threshold": "<= $8,00,000 (10x income)"
+      }
+    ],
+    "scorecard": {
+      "score": 0.8025,
+      "defaultProbability": 0.0556,
+      "modelVersion": "RiskModel-XGBoost v2.1.4 (Production)",
+      "modelType": "Ensemble Logistic Regression Scorecard",
+      "drivers": [
+        {
+          "feature": "bureau_score",
+          "label": "External Bureau Rating",
+          "impact": "negative",
+          "weight": -0.8,
+          "description": "Bureau credit score of 580 reflects moderate credit performance."
+        },
+        {
+          "feature": "foir_ratio",
+          "label": "Fixed Obligation Burden (FOIR)",
+          "impact": "negative",
+          "weight": -0.628,
+          "description": "Debt-to-income at 54.0% exceeds prime debt ceiling."
+        },
+        {
+          "feature": "tradeline_history",
+          "label": "Credit Depth & Tradelines",
+          "impact": "positive",
+          "weight": 0.3,
+          "description": "5.4 years active tradeline history (Established profile)."
+        },
+        {
+          "feature": "monthly_income",
+          "label": "Net Monthly Earnings",
+          "impact": "positive",
+          "weight": 0.48,
+          "description": "Monthly disposable income of $80,000 supports steady debt servicing."
+        }
+      ]
+    }
+  },
+  "step3": {
+    "adverseOutcome": "REJECT",
+    "failedHardStops": [
+      {
+        "ruleId": "R02",
+        "name": "Bureau Adverse History Check",
+        "description": "Active write-off, settled accounts, or 90+ DPD overdue on credit bureau.",
+        "type": "hard_stop",
+        "passed": false,
+        "observedValue": "Adverse Delinquency Present",
+        "threshold": "No Adverse Delinquencies",
+        "reasonCode": "ADVERSE_BUREAU_HISTORY"
+      },
+      {
+        "ruleId": "R03",
+        "name": "Minimum Credit Bureau Score",
+        "description": "External credit bureau score must be at or above hard minimum floor.",
+        "type": "hard_stop",
+        "passed": false,
+        "observedValue": 580,
+        "threshold": ">= 650",
+        "reasonCode": "BUREAU_SCORE_BELOW_MIN"
+      }
+    ],
+    "scorecardScore": 0.8025,
+    "precedenceFollowed": true
+  },
+  "step4": {
+    "exactReducingBalance": {
+      "formula": "P * r * (1+r)^n / ((1+r)^n - 1)",
+      "monthlyRate": 0.01,
+      "powFactor": 1.612226077682465,
+      "monthlyEmi": 21067.0683455422,
+      "totalDebt": 45067.0683455422,
+      "foirPercent": 56.333835431927746,
+      "foirBand": "Borderline (50%-65%)"
+    },
+    "engineInternal": {
+      "formula": "(P / n) * 1.15",
+      "location": "lib/engine/orchestrator.ts:30",
+      "monthlyEmi": 19166.666666666668,
+      "totalDebt": 43166.66666666667,
+      "foirPercent": 53.95833333333334,
+      "discrepancyEmi": 1900.4016788755325,
+      "discrepancyFoir": 2.375502098594403
+    },
+    "sandboxInternal": {
+      "formula": "(P / n) * 1.15",
+      "location": "app/decision-engine/page.tsx:19",
+      "monthlyEmi": 19166.666666666668,
+      "foirPercent": 53.95833333333334
+    }
+  },
+  "step5": {
+    "appId": "APP-6509",
+    "attempt0_initialStatus": "PENDING",
+    "retry1_httpStatus": 200,
+    "retry1_newStatus": "REFER",
+    "retry1_outcome": "REFER",
+    "retry1_reasonCodes": [
+      "FOIR_BORDERLINE"
+    ],
+    "retryCodeInspection": {
+      "location": "app/api/applications/[id]/retry/route.ts",
+      "finding": "The retry endpoint hardcodes attemptNumber=2 and hardcodes { bureauStatus: \"SUCCESS\" }, always resolving the retry as attempt 2 with forced SUCCESS dependencies. It never advances attempt to 3, so exhaustion to REFER (maxRetries=2) cannot naturally trigger through the API."
+    }
+  },
+  "step6": {
+    "targetAppId": "APP-8531",
+    "initialStatus": "REJECT",
+    "overrideRequestPayload": {
+      "action": "APPROVE_OVERRIDE",
+      "actor": "Fake Admin Without Token"
+    },
+    "overrideResponseStatus": 200,
+    "postOverrideAppStatus": "APPROVE",
+    "postOverrideManualReview": {
+      "resolvedAt": "2026-10-18T04:56:55.754Z",
+      "resolvedBy": "Fake Admin Without Token",
+      "resolution": "APPROVE_OVERRIDE",
+      "notes": "Adversarial unauthenticated override attempt"
+    },
+    "securityVulnerabilityFound": true,
+    "resultingAuditEvents": [
+      {
+        "id": "AUD-1792299415754",
+        "applicationId": "APP-8531",
+        "eventType": "MANUAL_REVIEW_RESOLVED",
+        "actor": "Fake Admin Without Token",
+        "policyVersion": "v4.2-active",
+        "timestamp": "2026-10-18T04:56:55.754Z",
+        "details": "Manual review override applied: APPROVE_OVERRIDE. Notes: Adversarial unauthenticated override attempt."
+      },
+      {
+        "id": "AUD-1792299414830",
+        "applicationId": "APP-8531",
+        "eventType": "APPLICATION_SUBMITTED",
+        "actor": "Adversarial Reject Case (Direct Submission)",
+        "policyVersion": "v4.2-active",
+        "modelVersion": "RiskModel-XGBoost v2.1.4 (Production)",
+        "timestamp": "2026-10-18T04:56:54.830Z",
+        "details": "Application submitted for $8,00,000 over 48m. Initial outcome: REJECT."
+      }
+    ]
+  },
+  "step7": {
+    "storageMechanism": "in-memory JavaScript class singleton (LoanWiseStore)",
+    "location": "lib/store/index.ts:441-508",
+    "durabilityClassification": "IN-MEMORY / EPHEMERAL",
+    "persistenceEvidence": "LoanWiseStore stores audit events in `private auditEvents: AuditEvent[] = [...INITIAL_AUDIT_LOG]`. There is no disk, database (PostgreSQL/SQLite), or persistent volume binding. Server restarts unconditionally restore INITIAL_AUDIT_LOG."
+  },
+  "step8": {
+    "file": "lib/ml/scorecard.ts",
+    "displayedModelVersion": "RiskModel-XGBoost v2.1.4 (Production)",
+    "displayedModelType": "Ensemble Logistic Regression Scorecard",
+    "actualImplementation": "Handcrafted heuristic JavaScript formula (logistic sigmoid)",
+    "hardcodedWeights": {
+      "intercept": 1.8,
+      "bureauWeight": 0.008,
+      "foirWeight": -4.5,
+      "incomeWeight": 0.4,
+      "ageBonus": 0.25,
+      "tradelineDepthPenalty": -0.45
+    },
+    "mlModelArtifactsPresent": false,
+    "verifiableTrainingPipeline": false,
+    "finding": "MISLEADING LABEL / MOCK ML: The system displays \"RiskModel-XGBoost v2.1.4 (Production)\" in the UI and API, but there is no trained XGBoost model, no serialized weights, no training dataset, and no evaluation metrics (AUC/Gini). It is a pure hardcoded synthetic logistic formula."
+  }
+}

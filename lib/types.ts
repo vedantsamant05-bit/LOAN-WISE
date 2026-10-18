@@ -63,6 +63,7 @@ export interface DecisionRecord {
   tatMs: number;
   createdAt: string;
   foir: number; // calculated FOIR percentage, e.g. 51.8
+  emi?: number; // estimated monthly EMI using reducing-balance formula
   scorecard: MLScorecardDetail;
   bureauScore: number;
   ruleResults: RuleResult[];
@@ -118,6 +119,7 @@ export interface PolicyConfig {
     timeoutSeconds: number;
     maxRetries: number;
   };
+  defaultAnnualInterestRate?: number; // e.g. 0.12 for 12% p.a., used in EMI calculation
 }
 
 export interface AuditEvent {
