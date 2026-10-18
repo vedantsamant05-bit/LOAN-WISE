@@ -47,29 +47,29 @@ export default function ApplicationsPage() {
   return (
     <div className="flex flex-col w-full">
       {/* Page Title & Actions */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-lg">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-md sm:mb-space-lg">
         <div>
-          <div className="flex items-center gap-space-sm mb-1">
+          <div className="flex items-center flex-wrap gap-2 mb-1">
             <span className="font-code-pill text-code-pill uppercase tracking-widest text-sage-700 bg-sage-100 px-2 py-0.5 rounded">
               PORTFOLIO LEDGER
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-label">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-[11px] sm:text-label">
               <span className="material-symbols-outlined text-[13px]">science</span>
               DEMO DATA
             </span>
           </div>
-          <h1 className="font-display text-display text-ink-900 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-display text-ink-900 tracking-tight">
             Applications Ledger
           </h1>
-          <p className="font-body-base text-body-base text-ink-700">
+          <p className="font-body-base text-sm sm:text-body-base text-ink-700">
             Real-time decision repository with full audit traceability and reason-code explainability.
           </p>
         </div>
 
-        <div className="flex items-center gap-space-sm shrink-0">
+        <div className="flex items-center flex-wrap gap-2 sm:gap-space-sm shrink-0">
           <button
             onClick={() => alert('Exporting signed applications ledger CSV...')}
-            className="flex items-center gap-2 h-10 px-4 rounded-lg bg-white border border-border text-ink-900 font-body-compact-medium text-body-compact-medium hover:bg-ivory-100 shadow-sm transition-colors"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 h-10 px-3 sm:px-4 rounded-lg bg-white border border-border text-ink-900 font-body-compact-medium text-body-compact-medium hover:bg-ivory-100 shadow-sm transition-colors"
             type="button"
           >
             <span className="material-symbols-outlined text-[18px] text-ink-700">download</span>
@@ -77,7 +77,7 @@ export default function ApplicationsPage() {
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 h-10 px-4 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium hover:bg-forest-800 shadow-sm transition-colors"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 h-10 px-3 sm:px-4 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium hover:bg-forest-800 shadow-sm transition-colors"
             type="button"
           >
             <span className="material-symbols-outlined text-[18px]">add</span>
@@ -87,9 +87,9 @@ export default function ApplicationsPage() {
       </div>
 
       {/* Filter and Tab Strip */}
-      <div className="bg-white rounded-xl shadow-sm border border-border p-space-sm mb-space-lg flex flex-col md:flex-row md:items-center justify-between gap-space-md">
-        {/* Status Tabs */}
-        <div className="flex flex-wrap items-center gap-1.5">
+      <div className="bg-white rounded-xl shadow-sm border border-border p-2.5 sm:p-space-sm mb-space-md sm:mb-space-lg flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-space-md">
+        {/* Status Tabs with smooth touch scrolling */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
           {[
             { id: 'ALL', label: 'All Cases', count: counts.all },
             { id: 'APPROVE', label: 'Approved', count: counts.approved },
@@ -100,7 +100,7 @@ export default function ApplicationsPage() {
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-body-compact font-body-compact transition-colors ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-caption sm:text-body-compact font-body-compact whitespace-nowrap transition-colors shrink-0 ${
                 statusFilter === tab.id
                   ? 'bg-forest-900 text-white font-medium shadow-sm'
                   : 'text-ink-700 hover:bg-ivory-100 hover:text-ink-900'
@@ -121,7 +121,7 @@ export default function ApplicationsPage() {
         </div>
 
         {/* Search Bar */}
-        <div className="relative min-w-[280px]">
+        <div className="relative w-full md:w-72 shrink-0">
           <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-ink-500">
             search
           </span>
@@ -129,7 +129,7 @@ export default function ApplicationsPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by ID, applicant, or city..."
+            placeholder="Search by ID, applicant..."
             className="w-full h-9 pl-9 pr-3 rounded-lg bg-ivory-50 border border-border text-body-compact text-ink-900 placeholder:text-ink-500 focus:outline-none focus:border-forest-900"
           />
         </div>
@@ -138,7 +138,7 @@ export default function ApplicationsPage() {
       {/* Applications Table */}
       <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-[#E2E7E2] dark:border-[#1C2E22] bg-[#F4F7F4] dark:bg-[#0C1610] text-[11px] uppercase tracking-wider font-semibold text-[#1A2E20] dark:text-[#F0FAF4]">
                 <th className="px-5 py-3.5 font-semibold text-[#1A2E20] dark:text-[#F0FAF4]">Application ID</th>

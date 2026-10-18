@@ -83,27 +83,27 @@ export default function CreditPolicyPage() {
       {/* Page Title & Controls */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-lg">
         <div>
-          <div className="flex items-center gap-space-sm mb-1">
+          <div className="flex items-center flex-wrap gap-2 mb-1">
             <span className="font-code-pill text-code-pill uppercase tracking-widest text-sage-700 bg-sage-100 px-2 py-0.5 rounded">
               CREDIT GOVERNANCE
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-label">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-[11px] sm:text-label">
               <span className="material-symbols-outlined text-[13px]">policy</span>
               VERSIONED POLICY ENGINE
             </span>
           </div>
-          <h1 className="font-display text-display text-ink-900 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-display text-ink-900 tracking-tight">
             Credit Policy Management
           </h1>
-          <p className="font-body-base text-body-base text-ink-700">
+          <p className="font-body-base text-sm sm:text-body-base text-ink-700">
             Configure risk thresholds, hard stop boundaries, and score cutoffs without requiring code deployments.
           </p>
         </div>
 
-        <div className="flex items-center gap-space-sm shrink-0">
+        <div className="flex items-center flex-wrap gap-2 sm:gap-space-sm shrink-0 w-full sm:w-auto">
           <button
             onClick={() => alert('Viewing Policy Changelog: v4.2-active, v4.1-deprecated, v4.0-baseline')}
-            className="flex items-center gap-2 h-10 px-4 rounded-lg bg-white border border-border text-ink-900 font-body-compact-medium text-body-compact-medium hover:bg-ivory-100 shadow-sm transition-colors"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-10 px-3 sm:px-4 rounded-lg bg-white border border-border text-ink-900 font-body-compact-medium text-body-compact-medium hover:bg-ivory-100 shadow-sm transition-colors"
             type="button"
           >
             <span className="material-symbols-outlined text-[18px]">history</span>
@@ -111,7 +111,7 @@ export default function CreditPolicyPage() {
           </button>
           <button
             onClick={() => alert('Policy changes require maker-checker approval before live publishing.')}
-            className="flex items-center gap-2 h-10 px-4 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium hover:bg-forest-800 shadow-sm transition-colors"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-10 px-3 sm:px-4 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium hover:bg-forest-800 shadow-sm transition-colors"
             type="button"
           >
             <span className="material-symbols-outlined text-[18px]">publish</span>
@@ -121,26 +121,26 @@ export default function CreditPolicyPage() {
       </div>
 
       {/* Active Version Overview Card */}
-      <div className="bg-white rounded-xl p-space-md shadow-sm border border-border mb-space-lg">
+      <div className="bg-white rounded-xl p-4 sm:p-space-md shadow-sm border border-border mb-space-md sm:mb-space-lg">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-forest-950 text-sage-200 flex items-center justify-center">
-              <span className="material-symbols-outlined text-[26px]">verified</span>
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-forest-950 text-sage-200 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[22px] sm:text-[26px]">verified</span>
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-section-title text-section-title font-semibold text-ink-900">
-                  Active Underwriting Policy: {policy.policyVersion}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-section-title text-base sm:text-section-title font-semibold text-ink-900">
+                  Active Policy: {policy.policyVersion}
                 </span>
-                <span className="text-[11px] px-2 py-0.5 rounded-full bg-status-success-bg text-status-success font-semibold">
+                <span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-status-success-bg text-status-success font-semibold">
                   LIVE IN PRODUCTION
                 </span>
               </div>
-              <p className="text-body-compact text-ink-700 mt-0.5">{policy.description}</p>
+              <p className="text-caption sm:text-body-compact text-ink-700 mt-0.5">{policy.description}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-6 text-body-compact border-t md:border-t-0 md:border-l border-border pt-3 md:pt-0 md:pl-6">
+          <div className="flex items-center flex-wrap gap-4 sm:gap-6 text-body-compact border-t md:border-t-0 md:border-l border-border pt-3 md:pt-0 md:pl-6">
             <div>
               <div className="text-caption text-ink-500 uppercase tracking-wider">Effective From</div>
               <div className="font-semibold text-ink-900">{policy.effectiveFrom}</div>

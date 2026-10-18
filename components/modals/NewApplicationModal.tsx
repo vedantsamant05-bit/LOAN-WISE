@@ -74,14 +74,14 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-forest-950/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full border border-border overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-forest-950/60 backdrop-blur-sm p-3 sm:p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full border border-border overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 bg-forest-950 text-white flex items-center justify-between border-b border-forest-900">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-sage-200 text-[24px]">post_add</span>
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-forest-950 text-white flex items-center justify-between border-b border-forest-900 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="material-symbols-outlined text-sage-200 text-[22px] sm:text-[24px]">post_add</span>
             <div>
-              <h2 className="font-section-title text-section-title font-semibold text-white">
+              <h2 className="font-section-title text-base sm:text-section-title font-semibold text-white">
                 New Credit Facility Application
               </h2>
               <p className="font-caption text-caption text-sage-500">
@@ -91,7 +91,7 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
           </div>
           <button
             onClick={onClose}
-            className="text-sage-500 hover:text-white transition-colors"
+            className="text-sage-500 hover:text-white transition-colors p-1"
             type="button"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
@@ -99,14 +99,14 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit}>
-          <div className="p-6">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             {step === 1 && (
               <div className="space-y-4">
                 <h3 className="font-body-compact-medium text-body-compact-medium text-ink-900 font-semibold border-b border-border pb-2">
                   1. Applicant &amp; Identity Details
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-label font-label text-ink-700 mb-1">
                       Full Legal Name
@@ -162,7 +162,7 @@ export function NewApplicationModal({ isOpen, onClose, onSuccess }: NewApplicati
                 <h3 className="font-body-compact-medium text-body-compact-medium text-ink-900 font-semibold border-b border-border pb-2">
                   2. Financials &amp; Affordability
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-label font-label text-ink-700 mb-1">
                       Employment Type

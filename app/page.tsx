@@ -32,28 +32,28 @@ export default function OverviewPage() {
   return (
     <div className="flex flex-col w-full">
       {/* Top Section: Editorial Heading & Master Controls */}
-      <div className="flex flex-col gap-space-lg mb-space-xl">
+      <div className="flex flex-col gap-space-md sm:gap-space-lg mb-space-lg sm:mb-space-xl">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-space-sm mb-1">
+            <div className="flex items-center flex-wrap gap-2 mb-1">
               <span className="font-code-pill text-code-pill uppercase tracking-widest text-sage-700 bg-sage-100 px-2 py-0.5 rounded">
                 PORTFOLIO INTELLIGENCE
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-label">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-[11px] sm:text-label">
                 <span className="material-symbols-outlined text-[13px]">info</span>
-                DEMO DATA — Synthetic environment; not for real credit decisions
+                DEMO DATA — Synthetic environment
               </span>
             </div>
-            <h1 className="font-display text-display text-ink-900 tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl lg:text-display text-ink-900 tracking-tight">
               Lending overview
             </h1>
-            <p className="font-body-base text-body-base text-ink-700">
+            <p className="font-body-base text-sm sm:text-body-base text-ink-700">
               Monitor application decisions, policy performance, and risk signals across active cohorts.
             </p>
           </div>
 
           {/* Action Group */}
-          <div className="flex items-center gap-space-sm shrink-0">
+          <div className="flex items-center flex-wrap gap-2 sm:gap-space-sm shrink-0">
             <button
               onClick={() => {
                 setSimActive(!simActive);
@@ -63,7 +63,7 @@ export default function OverviewPage() {
                     : 'Simulation Mode active. You can test edge-case fallbacks and failure injections.'
                 );
               }}
-              className={`flex items-center gap-2 h-10 px-4 rounded-lg font-body-compact-medium text-body-compact-medium shadow-sm transition-colors ${
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 h-10 px-3 sm:px-4 rounded-lg font-body-compact-medium text-body-compact-medium shadow-sm transition-colors ${
                 simActive
                   ? 'bg-status-warning-bg text-status-warning border border-status-warning'
                   : 'bg-white text-ink-900 hover:bg-ivory-100'
@@ -71,11 +71,11 @@ export default function OverviewPage() {
               type="button"
             >
               <span className="material-symbols-outlined text-[18px]">tune</span>
-              <span>{simActive ? 'Simulation: Active' : 'Simulation Mode'}</span>
+              <span>{simActive ? 'Sim: Active' : 'Simulation Mode'}</span>
             </button>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 h-10 px-4 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium hover:bg-forest-800 shadow-sm transition-colors"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 h-10 px-3 sm:px-4 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium hover:bg-forest-800 shadow-sm transition-colors"
               type="button"
             >
               <span className="material-symbols-outlined text-[18px]">add</span>
@@ -85,42 +85,42 @@ export default function OverviewPage() {
         </div>
 
         {/* Filter Strip */}
-        <div className="flex flex-wrap items-center justify-between gap-space-md p-space-sm rounded-xl bg-white shadow-sm border border-border">
-          <div className="flex flex-wrap items-center gap-space-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2.5 sm:p-space-sm rounded-xl bg-white shadow-sm border border-border">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-space-sm">
             <button
-              className="flex items-center gap-2 h-9 px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 font-body-compact text-body-compact transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 text-caption sm:text-body-compact font-medium transition-colors"
               type="button"
             >
-              <span className="material-symbols-outlined text-[16px] text-ink-500">calendar_today</span>
-              <span className="font-medium">Last 30 days</span>
-              <span className="material-symbols-outlined text-[16px] text-ink-500">expand_more</span>
+              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">calendar_today</span>
+              <span>Last 30 days</span>
+              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">expand_more</span>
             </button>
-            <div className="h-4 w-px bg-surface-container"></div>
+            <div className="hidden sm:block h-4 w-px bg-surface-container"></div>
             <button
-              className="flex items-center gap-2 h-9 px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 font-body-compact text-body-compact transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 text-caption sm:text-body-compact font-medium transition-colors"
               type="button"
             >
-              <span className="material-symbols-outlined text-[16px] text-ink-500">account_tree</span>
+              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">account_tree</span>
               <span>All loan products</span>
-              <span className="material-symbols-outlined text-[16px] text-ink-500">expand_more</span>
+              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">expand_more</span>
             </button>
-            <div className="h-4 w-px bg-surface-container"></div>
+            <div className="hidden sm:block h-4 w-px bg-surface-container"></div>
             <button
-              className="flex items-center gap-2 h-9 px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 font-body-compact text-body-compact transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg bg-ivory-50 hover:bg-ivory-100 text-ink-900 text-caption sm:text-body-compact font-medium transition-colors"
               type="button"
             >
-              <span className="material-symbols-outlined text-[16px] text-ink-500">shield</span>
+              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">shield</span>
               <span>All risk tiers</span>
-              <span className="material-symbols-outlined text-[16px] text-ink-500">expand_more</span>
+              <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-ink-500">expand_more</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-space-sm text-caption font-caption text-ink-500 pr-1">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sage-100 text-forest-900 font-body-compact-medium text-body-compact-medium">
-              <span className="material-symbols-outlined text-[15px] text-sage-700">verified_user</span>
+          <div className="flex items-center justify-between sm:justify-end gap-2 text-caption font-caption text-ink-500 pt-1 sm:pt-0 border-t sm:border-t-0 border-border">
+            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-sage-100 text-forest-900 font-body-compact-medium text-xs">
+              <span className="material-symbols-outlined text-[14px] text-sage-700">verified_user</span>
               Policy: v4.2-active
             </span>
-            <span>Synced just now</span>
+            <span className="text-[11px] sm:text-caption">Synced just now</span>
           </div>
         </div>
       </div>
@@ -435,9 +435,9 @@ export default function OverviewPage() {
 
         {/* Right: Recent Applications Ledger */}
         <div className="lg:col-span-8 bg-white rounded-xl shadow-sm border border-border overflow-hidden flex flex-col justify-between">
-          <div className="p-space-lg pb-space-sm flex items-center justify-between border-b border-border">
+          <div className="p-4 sm:p-space-lg pb-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border">
             <div>
-              <h2 className="font-section-title text-section-title font-semibold text-ink-900">
+              <h2 className="font-section-title text-base sm:text-section-title font-semibold text-ink-900">
                 Recent Applications Ledger
               </h2>
               <p className="font-caption text-caption text-ink-500">
@@ -446,7 +446,7 @@ export default function OverviewPage() {
             </div>
             <Link
               href="/applications"
-              className="text-forest-900 hover:text-forest-800 text-body-compact-medium font-body-compact-medium flex items-center gap-1"
+              className="text-forest-900 hover:text-forest-800 text-body-compact-medium font-body-compact-medium flex items-center gap-1 shrink-0"
             >
               <span>View full ledger</span>
               <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -454,7 +454,7 @@ export default function OverviewPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-[#E2E7E2] dark:border-[#1C2E22] bg-[#F4F7F4] dark:bg-[#0C1610] text-[11px] uppercase tracking-wider font-semibold text-[#1A2E20] dark:text-[#F0FAF4]">
                   <th className="px-4 py-3 font-semibold text-[#1A2E20] dark:text-[#F0FAF4]">Application ID</th>
@@ -513,7 +513,7 @@ export default function OverviewPage() {
             </table>
           </div>
 
-          <div data-table-footer className="p-3 bg-[#F4F7F4] dark:bg-[#0C1610] border-t border-[#E2E7E2] dark:border-[#1C2E22] flex items-center justify-between text-caption text-[#3D4C42] dark:text-[#D2E4D8] px-4">
+          <div data-table-footer className="p-3 bg-[#F4F7F4] dark:bg-[#0C1610] border-t border-[#E2E7E2] dark:border-[#1C2E22] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-caption text-[#3D4C42] dark:text-[#D2E4D8] px-4">
             <span>Showing {Math.min(6, applications.length)} of {applications.length} active applications</span>
             <span className="font-mono text-forest-900 dark:text-emerald-400 font-semibold">Policy: v4.2-active</span>
           </div>

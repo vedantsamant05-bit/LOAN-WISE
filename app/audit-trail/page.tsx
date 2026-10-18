@@ -26,28 +26,28 @@ export default function AuditTrailPage() {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-lg">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-md sm:mb-space-lg">
         <div>
-          <div className="flex items-center gap-space-sm mb-1">
+          <div className="flex items-center flex-wrap gap-2 mb-1">
             <span className="font-code-pill text-code-pill uppercase tracking-widest text-sage-700 bg-sage-100 px-2 py-0.5 rounded">
               IMMUTABLE AUDIT LOG
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-label">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-status-warning-bg text-status-warning font-label text-[11px] sm:text-label">
               <span className="material-symbols-outlined text-[13px]">history_toggle_off</span>
               APPEND-ONLY LEDGER
             </span>
           </div>
-          <h1 className="font-display text-display text-ink-900 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-display text-ink-900 tracking-tight">
             Compliance &amp; Decision Audit Trail
           </h1>
-          <p className="font-body-base text-body-base text-ink-700">
+          <p className="font-body-base text-sm sm:text-body-base text-ink-700">
             Append-only chronological record of every decisioning event, rule execution, and underwriter action.
           </p>
         </div>
 
         <button
           onClick={() => alert('Generating signed cryptographic audit hash digest...')}
-          className="flex items-center gap-2 h-10 px-4 rounded-lg bg-white border border-border text-ink-900 font-body-compact-medium text-body-compact-medium hover:bg-ivory-100 shadow-sm transition-colors"
+          className="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-white border border-border text-ink-900 font-body-compact-medium text-body-compact-medium hover:bg-ivory-100 shadow-sm transition-colors w-full sm:w-auto shrink-0"
           type="button"
         >
           <span className="material-symbols-outlined text-[18px]">verified</span>
@@ -57,7 +57,7 @@ export default function AuditTrailPage() {
 
       <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-body-compact border-collapse">
+          <table className="w-full text-left text-body-compact border-collapse min-w-[780px]">
             <thead>
               <tr className="border-b border-[#E2E7E2] dark:border-[#1C2E22] bg-[#F4F7F4] dark:bg-[#0C1610] text-[11px] uppercase tracking-wider font-semibold text-[#1A2E20] dark:text-[#F0FAF4]">
                 <th className="px-5 py-3.5 font-semibold text-[#1A2E20] dark:text-[#F0FAF4]">Timestamp (UTC)</th>

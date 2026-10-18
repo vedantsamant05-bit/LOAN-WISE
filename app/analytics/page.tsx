@@ -16,18 +16,18 @@ export default function AnalyticsPage() {
               FUNNEL &amp; TAT ANALYSIS
             </span>
           </div>
-          <h1 className="font-display text-display text-ink-900 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-display text-ink-900 tracking-tight">
             Portfolio Analytics
           </h1>
-          <p className="font-body-base text-body-base text-ink-700">
+          <p className="font-body-base text-sm sm:text-body-base text-ink-700">
             Conversion funnel drop-offs, manual-review operational bottlenecks, and latency SLAs.
           </p>
         </div>
       </div>
 
       {/* Digital Lending Funnel Card */}
-      <div className="bg-white rounded-xl p-space-lg shadow-sm border border-border mb-space-lg">
-        <h2 className="font-section-title text-section-title font-semibold text-ink-900 mb-1">
+      <div className="bg-white rounded-xl p-4 sm:p-space-lg shadow-sm border border-border mb-space-md sm:mb-space-lg">
+        <h2 className="font-section-title text-base sm:text-section-title font-semibold text-ink-900 mb-1">
           Digital Lending Funnel &amp; Drop-off Analysis
         </h2>
         <p className="text-caption text-ink-500 mb-6">
@@ -73,10 +73,10 @@ export default function AnalyticsPage() {
             },
           ].map((s, idx) => (
             <div key={idx} className="space-y-1.5">
-              <div className="flex items-center justify-between text-body-compact">
-                <span className="font-semibold text-ink-900">{s.stage}</span>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-ink-900 tabular-nums">{s.count}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-body-compact gap-1">
+                <span className="font-semibold text-ink-900 text-sm sm:text-body-compact">{s.stage}</span>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="font-mono text-ink-900 tabular-nums text-xs sm:text-body-compact">{s.count}</span>
                   <span className="text-caption font-semibold text-forest-900 dark:text-emerald-400">({s.pct})</span>
                   {s.drop !== '0%' && (
                     <span className="text-caption text-status-danger font-medium">{s.drop}</span>
@@ -92,17 +92,17 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Hourly Engine Throughput & Latency Curve Graph */}
-      <div className="bg-white rounded-xl p-space-lg shadow-sm border border-border mb-space-lg">
+      <div className="bg-white rounded-xl p-4 sm:p-space-lg shadow-sm border border-border mb-space-md sm:mb-space-lg">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 className="font-section-title text-section-title font-semibold text-ink-900">
+            <h2 className="font-section-title text-base sm:text-section-title font-semibold text-ink-900">
               Real-Time Decision Throughput &amp; Engine Latency Trend
             </h2>
             <p className="text-caption text-ink-500">
               Evaluations executed per hour vs P95 execution response SLA ceiling (3.00s)
             </p>
           </div>
-          <div className="flex items-center gap-4 text-caption font-medium">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-caption font-medium">
             <span className="flex items-center gap-1.5 text-ink-700">
               <span className="w-3 h-0.5 bg-emerald-600 dark:bg-emerald-400"></span>
               Throughput (Cases/hr)
@@ -171,7 +171,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Turnaround Time (TAT) & Underwriting Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg mb-space-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-space-lg mb-space-lg">
         <div className="bg-white rounded-xl p-space-md shadow-sm border border-border">
           <span className="text-caption uppercase text-ink-500 tracking-wider">Median Engine TAT (P50)</span>
           <div className="text-display font-semibold text-ink-900 mt-1">412ms</div>

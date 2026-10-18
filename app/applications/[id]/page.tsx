@@ -108,7 +108,7 @@ export default function DecisionResultPage() {
           </div>
 
           <div className="flex items-center flex-wrap gap-space-sm">
-            <h1 className="font-page-title text-page-title text-ink-900">
+            <h1 className="font-page-title text-xl sm:text-2xl md:text-page-title text-ink-900 break-words">
               Application Decision Result — {application.id}
             </h1>
             <StatusBadge status={application.status} size="lg" />
@@ -116,16 +116,16 @@ export default function DecisionResultPage() {
         </div>
 
         {/* Quick Action Toolbar */}
-        <div className="flex items-center flex-wrap gap-2">
+        <div className="flex items-center flex-wrap gap-2 w-full sm:w-auto">
           {isPending && (
             <button
               onClick={handleReRun}
               disabled={reRunning}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium shadow-sm transition-all"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-forest-900 text-white font-body-compact-medium text-body-compact-medium shadow-sm transition-all"
               type="button"
             >
               <span className="material-symbols-outlined text-[18px]">replay</span>
-              <span>{reRunning ? 'Retrying...' : 'Retry Verification'}</span>
+              <span>{reRunning ? 'Retrying...' : 'Retry'}</span>
             </button>
           )}
 
@@ -198,7 +198,7 @@ export default function DecisionResultPage() {
       {/* Primary Metadata Card (4 Columns) matching Stitch screen */}
       <div className="bg-white rounded-xl p-space-md shadow-sm border border-border mb-space-lg relative overflow-hidden">
         <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-sage-100/50 pointer-events-none blur-2xl"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md relative z-10">
           {/* Column 1: Applicant Profile */}
           <div className="flex items-start gap-3">
             <div className="relative shrink-0">
@@ -206,7 +206,7 @@ export default function DecisionResultPage() {
               <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-status-success ring-2 ring-white dark:ring-[#131F16]"></span>
             </div>
             <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="font-body-compact-medium text-body-compact-medium text-ink-900 font-semibold truncate">
                   {applicant.name}
                 </span>
@@ -227,7 +227,7 @@ export default function DecisionResultPage() {
           </div>
 
           {/* Column 2: Requested Facility */}
-          <div className="flex flex-col justify-center pl-0 md:pl-space-sm border-t md:border-t-0 md:border-l border-border pt-3 md:pt-0">
+          <div className="flex flex-col justify-center pl-0 sm:pl-space-sm border-t sm:border-t-0 sm:border-l border-border pt-3 sm:pt-0">
             <span className="font-caption text-caption uppercase tracking-wider text-ink-500">
               Requested Facility
             </span>
@@ -248,11 +248,11 @@ export default function DecisionResultPage() {
           </div>
 
           {/* Column 3: Affordability Metrics */}
-          <div className="flex flex-col justify-center pl-0 md:pl-space-sm border-t md:border-t-0 md:border-l border-border pt-3 md:pt-0">
+          <div className="flex flex-col justify-center pl-0 sm:pl-space-sm border-t lg:border-t-0 sm:border-l border-border pt-3 sm:pt-0">
             <span className="font-caption text-caption uppercase tracking-wider text-ink-500">
               Affordability &amp; FOIR
             </span>
-            <div className="flex items-baseline gap-2 mt-0.5">
+            <div className="flex items-baseline gap-2 mt-0.5 flex-wrap">
               <span
                 className={`font-section-title text-section-title font-semibold ${
                   (decision?.foir || 0) > 65
@@ -266,16 +266,16 @@ export default function DecisionResultPage() {
               </span>
               <span className="font-caption text-caption text-status-warning bg-status-warning-bg px-1.5 py-0.2 rounded font-medium">
                 {decision?.foir && decision.foir >= 50
-                  ? `+${(decision.foir - 50).toFixed(1)}% over standard 50%`
-                  : 'Within standard capacity'}
+                  ? `+${(decision.foir - 50).toFixed(1)}% over 50%`
+                  : 'Within capacity'}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-1 font-caption text-caption text-ink-700">
+            <div className="flex items-center gap-2 mt-1 font-caption text-caption text-ink-700 flex-wrap">
               <span>
-                Net Income: <strong>${applicant.monthlyIncome.toLocaleString()}/mo</strong>
+                Net: <strong>${applicant.monthlyIncome.toLocaleString()}/mo</strong>
               </span>
               <span className="text-ink-500">•</span>
-              <span>Obligations: ${applicant.existingMonthlyObligations.toLocaleString()}/mo</span>
+              <span>Oblig: ${applicant.existingMonthlyObligations.toLocaleString()}/mo</span>
             </div>
           </div>
 

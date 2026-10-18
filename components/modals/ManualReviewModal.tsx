@@ -58,13 +58,13 @@ export function ManualReviewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-forest-950/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-border overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        <div className="px-6 py-4 bg-forest-950 text-white flex items-center justify-between border-b border-forest-900">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-sage-200 text-[24px]">gavel</span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-forest-950/60 backdrop-blur-sm p-3 sm:p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-border overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-forest-950 text-white flex items-center justify-between border-b border-forest-900 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="material-symbols-outlined text-sage-200 text-[22px] sm:text-[24px]">gavel</span>
             <div>
-              <h2 className="font-section-title text-section-title font-semibold text-white">
+              <h2 className="font-section-title text-base sm:text-section-title font-semibold text-white">
                 Underwriting Manual Review
               </h2>
               <p className="font-caption text-caption text-sage-500">
@@ -74,20 +74,20 @@ export function ManualReviewModal({
           </div>
           <button
             onClick={onClose}
-            className="text-sage-500 hover:text-white transition-colors"
+            className="text-sage-500 hover:text-white transition-colors p-1"
             type="button"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
             <div>
               <label className="block text-label font-label text-ink-700 mb-1.5">
                 Resolution Action
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => setAction('APPROVE_OVERRIDE')}

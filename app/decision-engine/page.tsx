@@ -49,25 +49,25 @@ export default function DecisionEnginePage() {
               ENGINE ORCHESTRATOR
             </span>
           </div>
-          <h1 className="font-display text-display text-ink-900 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-display text-ink-900 tracking-tight">
             Decision Engine Architecture
           </h1>
-          <p className="font-body-base text-body-base text-ink-700">
+          <p className="font-body-base text-sm sm:text-body-base text-ink-700">
             End-to-end evaluation stages, execution precedence, and interactive rule simulator.
           </p>
         </div>
       </div>
 
       {/* Decision Pipeline Flowchart matching LOANPLAN.MD Section 5 */}
-      <div className="bg-white rounded-xl p-space-lg shadow-sm border border-border mb-space-lg">
-        <h2 className="font-section-title text-section-title font-semibold text-ink-900 mb-2">
+      <div className="bg-white rounded-xl p-4 sm:p-space-lg shadow-sm border border-border mb-space-md sm:mb-space-lg">
+        <h2 className="font-section-title text-base sm:text-section-title font-semibold text-ink-900 mb-2">
           Execution Order &amp; Precedence Pipeline
         </h2>
-        <p className="text-body-compact text-ink-700 mb-space-md">
+        <p className="text-caption sm:text-body-compact text-ink-700 mb-space-md">
           Strict precedence: Hard-Stops (Reject) &gt; Dependency Fallback (Pending &rarr; Refer) &gt; Soft Rules (Refer) &gt; ML Score Bands.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
             {
               step: '1. Ingestion',
@@ -132,17 +132,17 @@ export default function DecisionEnginePage() {
       </div>
 
       {/* Interactive Sandbox Simulator */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md sm:gap-space-lg">
         {/* Sandbox Inputs */}
-        <div className="lg:col-span-7 bg-white rounded-xl p-space-lg shadow-sm border border-border">
-          <h2 className="font-section-title text-section-title font-semibold text-ink-900 mb-1">
+        <div className="lg:col-span-7 bg-white rounded-xl p-4 sm:p-space-lg shadow-sm border border-border">
+          <h2 className="font-section-title text-base sm:text-section-title font-semibold text-ink-900 mb-1">
             Real-Time Engine Sandbox
           </h2>
           <p className="text-caption text-ink-500 mb-4">
             Adjust synthetic borrower parameters to watch real-time rule triggering and precedence resolution.
           </p>
 
-          <div className="grid grid-cols-2 gap-4 text-body-compact">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-body-compact">
             <div>
               <label className="block text-label text-ink-700 mb-1">Applicant Age (21–60)</label>
               <input

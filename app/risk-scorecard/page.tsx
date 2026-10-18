@@ -16,29 +16,29 @@ export default function RiskScorecardPage() {
               ML SCORECARD
             </span>
           </div>
-          <h1 className="font-display text-display text-ink-900 tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-display text-ink-900 tracking-tight">
             Risk Scorecard &amp; Model Card
           </h1>
-          <p className="font-body-base text-body-base text-ink-700">
+          <p className="font-body-base text-sm sm:text-body-base text-ink-700">
             Documented evaluation metrics, feature weights, probability calibration, and responsible lending checks.
           </p>
         </div>
       </div>
 
       {/* Model Overview Summary Banner */}
-      <div className="bg-white rounded-xl p-space-md shadow-sm border border-border mb-space-lg">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-body-compact">
-          <div className="border-r border-border pr-4">
+      <div className="bg-white rounded-xl p-4 sm:p-space-md shadow-sm border border-border mb-space-md sm:mb-space-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-body-compact">
+          <div className="border-b sm:border-b-0 sm:border-r border-border pb-3 sm:pb-0 sm:pr-4">
             <span className="text-caption text-ink-500 uppercase tracking-wider">Model Artifact</span>
             <div className="font-semibold text-ink-900 mt-0.5">RiskModel-XGBoost v2.1.4</div>
             <span className="text-caption text-emerald-600 dark:text-emerald-400 font-medium">Calibrated Logistic Ensemble</span>
           </div>
-          <div className="border-r border-border pr-4">
+          <div className="border-b sm:border-b-0 md:border-r border-border pb-3 sm:pb-0 sm:pr-4">
             <span className="text-caption text-ink-500 uppercase tracking-wider">Benchmark Dataset</span>
             <div className="font-semibold text-ink-900 mt-0.5">Kaggle Credit Default (Proxy)</div>
             <span className="text-caption text-ink-500">150,000 synthetic rows (80/20 split)</span>
           </div>
-          <div className="border-r border-border pr-4">
+          <div className="border-b sm:border-b-0 sm:border-r border-border pb-3 sm:pb-0 sm:pr-4">
             <span className="text-caption text-ink-500 uppercase tracking-wider">Primary Objective</span>
             <div className="font-semibold text-ink-900 mt-0.5">Probability of Default (PD)</div>
             <span className="text-caption text-status-success font-medium">Calibrated Brier: 0.084</span>
@@ -141,7 +141,7 @@ export default function RiskScorecardPage() {
               True Positive Rate vs False Positive Rate across operational decision thresholds
             </p>
           </div>
-          <div className="flex items-center gap-4 text-caption font-medium">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-caption font-medium">
             <span className="flex items-center gap-1.5 text-ink-700">
               <span className="w-3 h-0.5 bg-emerald-600 dark:bg-emerald-400"></span>
               XGBoost Model (AUC = 0.832)
